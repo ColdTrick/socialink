@@ -9,6 +9,25 @@
 	<field key="elgg_version" value="2010040201" />
 </plugin_manifest>
 <!--
+
+=====================
+External libaries
+=====================
+Twitter OAuth
+- by Abraham Williams
+- URL: http://github.com/abraham/twitteroauth
+
+Facebook PHP SDK
+- by Facebook
+- URL: https://github.com/facebook/php-sdk
+
+Simple LinkedIn
+- by Paul Mennega
+- URL: http://code.google.com/p/simple-linkedinphp/
+
+OAuth PHP
+- URL: http://code.google.com/p/oauth/
+
 =====================
 ToDo
 =====================
@@ -25,6 +44,9 @@ Features
 =====================
 Version history:
 =====================
+x.x:
+	- changed: Facebook PHP SDK to version 3.1.1 (was 2.1.2)
+
 0.5.1 (2011-08-05):
 	- fixed: create user caching issue
 	- fixed: login didn't work in some site setups
