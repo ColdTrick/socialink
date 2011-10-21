@@ -7,10 +7,10 @@
  */
 
 /* Load OAuth lib. You can find it at http://oauth.net */
-if (!class_exists('OAuthConsumer')) {
+/* if (!class_exists('OAuthConsumer')) {
 	require_once('OAuth.php');
 }
-
+ */
 /**
  * Twitter OAuth class
  */
@@ -59,13 +59,19 @@ class TwitterOAuth {
    * construct TwitterOAuth object
    */
   function __construct($consumer_key, $consumer_secret, $oauth_token = NULL, $oauth_token_secret = NULL) {
+  	echo "a";
     $this->sha1_method = new OAuthSignatureMethod_HMAC_SHA1();
+    echo "b";
     $this->consumer = new OAuthConsumer($consumer_key, $consumer_secret);
+    echo "c";
     if (!empty($oauth_token) && !empty($oauth_token_secret)) {
+    	echo "d";
       $this->token = new OAuthConsumer($oauth_token, $oauth_token_secret);
     } else {
+    	echo "e";
       $this->token = NULL;
     }
+    echo "f";
   }
 
 

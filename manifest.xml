@@ -1,85 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin_manifest>
-	<field key="author" value="ColdTrick IT Solutions" />
-	<field key="version" value="0.5.1" />
-	<field key="description" value="SociaLink connect with other social networks" />
-	<field key="website" value="http://www.coldtrick.com/" />
-	<field key="copyright" value="(C) ColdTrick IT Solutions 2011" />
-	<field key="licence" value="GNU Public License version 2" />
-	<field key="elgg_version" value="2010040201" />
+<plugin_manifest xmlns="http://www.elgg.org/plugin_manifest/1.8">
+	<name>SociaLink</name>
+	<author>ColdTrick IT Solutions</author>
+	<version>0.5.1</version>
+	<blurb>SociaLink connect with other social networks</blurb>
+	<description>Login to your Elgg social network useing LinkedIn, Twitter and/or Facebook.</description>
+	<website>http://www.coldtrick.com/</website>
+	<copyright>(C) ColdTrick IT Solutions 2009 - 2011</copyright>
+	<license>GNU Public License version 2</license>
+	
+	<requires>
+		<type>elgg_version</type>
+		<version>2011061200</version>
+	</requires>
+	
+	<requires>
+		<type>php_extension</type>
+		<name>json</name>
+	</requires>
+	<requires>
+		<type>php_extension</type>
+		<name>curl</name>
+	</requires>
+	
+ 	<category>ColdTrick</category>
 </plugin_manifest>
-<!--
-
-=====================
-External libaries
-=====================
-Twitter OAuth
-- by Abraham Williams
-- URL: http://github.com/abraham/twitteroauth
-
-Facebook PHP SDK
-- by Facebook
-- URL: https://github.com/facebook/php-sdk
-
-Simple LinkedIn
-- by Paul Mennega
-- URL: http://code.google.com/p/simple-linkedinphp/
-
-OAuth PHP
-- URL: http://code.google.com/p/oauth/
-
-=====================
-ToDo
-=====================
-- if the wire to network, prevent twitter deadloops
-
-=====================
-Features
-=====================
- - Connect to Facebook, LinkedIn and Twitter
- - Login (for registrered users) with social network account
- - Create an account based on Facebook, Twitter or LinkedIn (admin option)
- - Link profile data to Elgg profile
- 
-=====================
-Version history:
-=====================
-x.x:
-	- changed: Facebook PHP SDK to version 3.1.1 (was 2.1.2)
-
-0.5.1 (2011-08-05):
-	- fixed: create user caching issue
-	- fixed: login didn't work in some site setups
-
-0.5 (2011-06-22):
-	- added: Twitter to The Wire (with admin and user settings)
-	- added: option to directly link social media account with site account
-	- changed: layout of plugin views
-	- fixed: fancybox css
-
-0.4.1 (2011-05-26):
-	- changed: better selection of profile fields
-	- fixed: Fancybox CSS error in IE
-
-0.4 (2011-05-12):
-	- added: LinkedIn name (combination of firstname and lastname)
-	- changed: login with network layout
-	- changed: login with network error message
-
-0.3 (2011-04-27):
-	- added: check on login if connections to social networks are still valid, if not they are removed 
-	- added: view to show share buttons to all connected networks
-	- added: function to retrieve all the networks a user is connected to
-
-0.2 (2011-04-26):
-	- added: option to create an account from LinkedIn
-	- added: option to create an account from Facebook
-	- added: option to create an account from Twitter
-	- added: option to sync profile data from LinkedIn
-	- added: option to sync profile data from Facebook
-	- added: option to sync profile data from Twitter
-
-0.1 (2011-03-01):
-	- initial release
-
--->

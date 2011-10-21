@@ -1,10 +1,9 @@
 <?php 
 
 	function socialink_load_networks(){
-		
 		if($networks = socialink_get_available_networks()){
 			foreach($networks as $network){
-				require_once(dirname(__FILE__) . "/networks/" . $network . ".php");
+				elgg_load_library("socialink:" . $network);
 			}
 		}
 	}
@@ -12,9 +11,9 @@
 	function socialink_twitter_available(){
 		$result = false;
 		
-		if(get_plugin_setting("enable_twitter", "socialink") == "yes"){
-			$consumer_key = get_plugin_setting("twitter_consumer_key", "socialink");
-			$consumer_secret = get_plugin_setting("twitter_consumer_secret", "socialink");
+		if(elgg_get_plugin_setting("enable_twitter", "socialink") == "yes"){
+			$consumer_key = elgg_get_plugin_setting("twitter_consumer_key", "socialink");
+			$consumer_secret = elgg_get_plugin_setting("twitter_consumer_secret", "socialink");
 			
 			if(!empty($consumer_key) && !empty($consumer_secret)){
 				$result = array(
@@ -30,10 +29,10 @@
 	function socialink_facebook_available(){
 		$result = false;
 		
-		if(get_plugin_setting("enable_facebook", "socialink") == "yes"){
-			$app_id = get_plugin_setting("facebook_app_id", "socialink");
-			$app_secret = get_plugin_setting("facebook_app_secret", "socialink");
-			$api_key = get_plugin_setting("facebook_api_key", "socialink");
+		if(elgg_get_plugin_setting("enable_facebook", "socialink") == "yes"){
+			$app_id = elgg_get_plugin_setting("facebook_app_id", "socialink");
+			$app_secret = elgg_get_plugin_setting("facebook_app_secret", "socialink");
+			$api_key = elgg_get_plugin_setting("facebook_api_key", "socialink");
 			
 			if(!empty($app_id) && !empty($app_secret) && !empty($api_key)){
 				$result = array(
@@ -50,9 +49,9 @@
 	function socialink_linkedin_available(){
 		$result = false;
 		
-		if(get_plugin_setting("enable_linkedin", "socialink") == "yes"){
-			$consumer_key = get_plugin_setting("linkedin_consumer_key", "socialink");
-			$consumer_secret = get_plugin_setting("linkedin_consumer_secret", "socialink");
+		if(elgg_get_plugin_setting("enable_linkedin", "socialink") == "yes"){
+			$consumer_key = elgg_get_plugin_setting("linkedin_consumer_key", "socialink");
+			$consumer_secret = elgg_get_plugin_setting("linkedin_consumer_secret", "socialink");
 			
 			if(!empty($consumer_key) && !empty($consumer_secret)){
 				$result = array(
@@ -116,7 +115,7 @@
 		$result = array();
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if($available_networks = socialink_get_available_networks()){
@@ -195,7 +194,7 @@
 				$temp = array();
 				
 				foreach($fields as $setting_name => $network_name){
-					if(($profile_field = get_plugin_setting($network . "_profile_" . $setting_name, "socialink")) && !empty($profile_field)){
+					if(($profile_field = elgg_get_plugin_setting($network . "_profile_" . $setting_name, "socialink")) && !empty($profile_field)){
 						$result[$setting_name] = $profile_field;
 					}
 				}
@@ -239,4 +238,3 @@
 		return $result;
 	}
 	
-?>

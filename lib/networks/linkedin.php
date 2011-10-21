@@ -1,9 +1,5 @@
 <?php 
 
-	if(!class_exists("LinkedIn")){
-		require_once(dirname(dirname(dirname(__FILE__))) . "/vendors/simple_linkedin/linkedin_3.0.1.class.php");
-	}
-	
 	function socialink_linkedin_get_api_object($keys){
 		$result = false;
 		
@@ -39,12 +35,12 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($user_guid) && ($keys = socialink_linkedin_available())){
-			$oauth_token = get_plugin_usersetting("linkedin_oauth_token", $user_guid, "socialink");
-			$oauth_secret = get_plugin_usersetting("linkedin_oauth_secret", $user_guid, "socialink");
+			$oauth_token = elgg_get_plugin_user_setting("linkedin_oauth_token", $user_guid, "socialink");
+			$oauth_secret = elgg_get_plugin_user_setting("linkedin_oauth_secret", $user_guid, "socialink");
 			
 			if(!empty($oauth_token) && !empty($oauth_secret)){
 				$result = $keys;
@@ -131,7 +127,7 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		$oauth_verifier = get_input('oauth_verifier', NULL);
@@ -139,29 +135,34 @@
 		if(!empty($user_guid) && ($token = socialink_linkedin_get_access_token($oauth_verifier))){
 			if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
 				// only one user per tokens
-				$values = array(
-					'plugin:settings:socialink:linkedin_oauth_token' => $token['oauth_token'],
-					'plugin:settings:socialink:linkedin_oauth_secret' => $token['oauth_token_secret'],
+				$params = array(
+					"type" => "user",
+					"limit" => false,
+					"site_guids" => false,
+					"private_setting_name_value_pairs" => array(
+						"plugin:settings:socialink:linkedin_oauth_token" => $token["oauth_token"],
+						"plugin:settings:socialink:linkedin_oauth_secret" => $token["oauth_token_secret"],
+					)
 				);
-			
+				
 				// find hidden users (just created)
 				$access_status = access_get_show_hidden_status();
 				access_show_hidden_entities(true);
 				
-				if ($users = get_entities_from_private_setting_multi($values, 'user', '', 0, '', false, 0, false, -1)) {
+				if ($users = elgg_get_entities_from_private_settings($params)) {
 					foreach ($users as $user) {
 						// revoke access
-						set_plugin_usersetting('linkedin_oauth_token', NULL, $user->getGUID(), "socialink");
-						set_plugin_usersetting('linkedin_oauth_secret', NULL, $user->getGUID(), "socialink");
+						elgg_unset_plugin_user_setting("linkedin_oauth_token", $user->getGUID(), "socialink");
+						elgg_unset_plugin_user_setting("linkedin_oauth_secret", $user->getGUID(), "socialink");
 					}
 				}
 				
 				// restore hidden status
 				access_show_hidden_entities($access_status);
 				
-				// register user's access tokens
-				set_plugin_usersetting('linkedin_oauth_token', $token['oauth_token'], $user_guid, "socialink");
-				set_plugin_usersetting('linkedin_oauth_secret', $token['oauth_token_secret'], $user_guid, "socialink");
+				// register user"s access tokens
+				elgg_set_plugin_user_setting("linkedin_oauth_token", $token["oauth_token"], $user_guid, "socialink");
+				elgg_set_plugin_user_setting("linkedin_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
 			
 				$result = true;
 			}
@@ -174,7 +175,7 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($user_guid) && ($keys = socialink_linkedin_is_connected($user_guid))){
@@ -186,8 +187,8 @@
 			}
 			
 			// remove plugin settings
-			set_plugin_usersetting("linkedin_oauth_token", null, $user_guid, "socialink");
-			set_plugin_usersetting("linkedin_oauth_secret", null, $user_guid, "socialink");
+			elgg_unset_plugin_user_setting("linkedin_oauth_token", $user_guid, "socialink");
+			elgg_unset_plugin_user_setting("linkedin_oauth_secret", $user_guid, "socialink");
 			
 			$result = true;
 		}
@@ -199,7 +200,7 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($message) && !empty($user_guid) && ($keys = socialink_linkedin_is_connected($user_guid))){
@@ -219,7 +220,7 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($user_guid) && ($keys = socialink_linkedin_is_connected($user_guid))){
@@ -243,13 +244,13 @@
 		global $CONFIG;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		// can we get a user
 		if(($user = get_user($user_guid)) && socialink_linkedin_is_connected($user_guid)){
 			// does the user allow sync
-			if(get_plugin_usersetting("linkedin_sync_allow", $user->getGUID(), "socialink") != "no"){
+			if(elgg_get_plugin_user_setting("linkedin_sync_allow", $user->getGUID(), "socialink") != "no"){
 				// get configured fields and network fields
 				if(($configured_fields = socialink_get_configured_network_fields("linkedin")) && ($network_fields = socialink_get_network_fields("linkedin"))){
 					// ask the api for all fields
@@ -260,7 +261,7 @@
 						foreach($configured_fields as $setting_name => $profile_field){
 							$setting = "linkedin_sync_" . $setting_name;
 							
-							if(get_plugin_usersetting($setting, $user->getGUID(), "socialink") != "no"){
+							if(elgg_get_plugin_user_setting($setting, $user->getGUID(), "socialink") != "no"){
 								$api_setting = $network_fields[$setting_name];
 								
 								// get the correct value from api result
@@ -283,7 +284,13 @@
 								}
 								
 								// check if the user has this metadata field, to get access id
-								if($metadata = get_metadata_byname($user->getGUID(), $profile_field)){
+								$params = array(
+									"guid" => $user->getGUID(),
+									"metadata_name" => $profile_field,
+									"limit" => false
+								);
+								
+								if($metadata = elgg_get_metadata($params)){
 									if(is_array($metadata)){
 										$access_id = $metadata[0]->access_id;
 									} else {
@@ -294,7 +301,7 @@
 								}
 								
 								// remove metadata to set new values
-								remove_metadata($user->getGUID(), $profile_field);
+								elgg_delete_metadata($params);
 								
 								// make new metadata field
 								if(!empty($temp_result)){
@@ -352,8 +359,8 @@
 								
 								if($user = get_user($user_guid)){
 									// save user tokens
-									set_plugin_usersetting('linkedin_oauth_token', $token['oauth_token'], $user_guid, "socialink");
-									set_plugin_usersetting('linkedin_oauth_secret', $token['oauth_token_secret'], $user_guid, "socialink");
+									elgg_set_plugin_user_setting('linkedin_oauth_token', $token['oauth_token'], $user_guid, "socialink");
+									elgg_set_plugin_user_setting('linkedin_oauth_secret', $token['oauth_token_secret'], $user_guid, "socialink");
 									
 									// return the user
 									$result = $user;
@@ -378,7 +385,7 @@
 		$result = true;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		// can we get a user
@@ -392,5 +399,3 @@
 		}
 		return $result;		
 	}
-
-?>

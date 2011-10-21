@@ -1,9 +1,5 @@
 <?php 
 
-	if(!class_exists("Facebook")){
-		require_once(dirname(dirname(dirname(__FILE__))) . "/vendors/facebook_php_sdk/src/facebook.php");
-	}
-	
 	define("FACEBOOK_OAUTH_BASE_URL", "https://www.facebook.com/dialog/oauth?client_id=");
 
 	function socialink_facebook_get_api_object($keys){
@@ -25,11 +21,11 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($user_guid) && ($keys = socialink_facebook_available())){
-			$token = get_plugin_usersetting("facebook_access_token", $user_guid, "socialink");
+			$token = elgg_get_plugin_user_setting("facebook_access_token", $user_guid, "socialink");
 			
 			if(!empty($token)){
 				$result = $keys;
@@ -118,24 +114,30 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
+		
 		$state = get_input('state', NULL);
 		
 		if(!empty($user_guid) && ($token = socialink_facebook_get_access_token($state))){
 			// only one user per tokens
-			$values = array(
-				'plugin:settings:socialink:facebook_access_token' => $token
+			$params = array(
+				"type" => "user",
+				"limit" => false,
+				"site_guids" => false,
+				"private_setting_name_value_pairs" => array(
+					"plugin:settings:socialink:facebook_access_token" => $token
+				)
 			);
-		
+			
 			// find hidden users (just created)
 			$access_status = access_get_show_hidden_status();
 			access_show_hidden_entities(true);
 			
-			if ($users = get_entities_from_private_setting_multi($values, 'user', '', 0, '', false, 0, false, -1)) {
+			if ($users = elgg_get_entities_from_private_settings($params)) {
 				foreach ($users as $user) {
 					// revoke access
-					set_plugin_usersetting('facebook_access_token', NULL, $user->getGUID(), "socialink");
+					elgg_unset_plugin_user_setting("facebook_access_token", $user->getGUID(), "socialink");
 				}
 			}
 			
@@ -143,9 +145,7 @@
 			access_show_hidden_entities($access_status);
 			
 			// register user's access tokens
-			set_plugin_usersetting('facebook_access_token', $token, $user_guid, "socialink");
-			
-			$result = true;
+			$result = elgg_set_plugin_user_setting("facebook_access_token", $token, $user_guid, "socialink");
 		}
 		
 		return $result;
@@ -155,14 +155,12 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($user_guid) && socialink_facebook_is_connected($user_guid)){
 			// remove plugin settings
-			set_plugin_usersetting("facebook_access_token", null, $user_guid, "socialink");
-			
-			$result = true;
+			$result = elgg_unset_plugin_user_setting("facebook_access_token", $user_guid, "socialink");
 		}
 		
 		return $result;
@@ -172,7 +170,7 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($message) && !empty($user_guid) && ($keys = socialink_facebook_is_connected($user_guid))){
@@ -197,7 +195,7 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($user_guid) && ($keys = socialink_facebook_is_connected($user_guid))){
@@ -221,13 +219,13 @@
 		global $CONFIG;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		// can we get a user
 		if(($user = get_user($user_guid)) && socialink_facebook_is_connected($user_guid)){
 			// does the user allow sync
-			if(get_plugin_usersetting("facebook_sync_allow", $user->getGUID(), "socialink") != "no"){
+			if(elgg_get_plugin_user_setting("facebook_sync_allow", $user->getGUID(), "socialink") != "no"){
 				// get configured fields and network fields
 				if(($configured_fields = socialink_get_configured_network_fields("facebook")) && ($network_fields = socialink_get_network_fields("facebook"))){
 					// ask the api for all fields
@@ -237,7 +235,7 @@
 						foreach($configured_fields as $setting_name => $profile_field){
 							$setting = "facebook_sync_" . $setting_name;
 							
-							if(get_plugin_usersetting($setting, $user->getGUID(), "socialink") != "no"){
+							if(elgg_get_plugin_user_setting($setting, $user->getGUID(), "socialink") != "no"){
 								$api_setting = $network_fields[$setting_name];
 								
 								$temp_result = $api_result[$api_setting];
@@ -250,7 +248,13 @@
 								}
 								
 								// check if the user has this metadata field, to get access id
-								if($metadata = get_metadata_byname($user->getGUID(), $profile_field)){
+								$params = array(
+									"guid" => $user->getGUID(),
+									"metadata_name" => $profile_field,
+									"limit" => false
+								);
+								
+								if($metadata = elgg_get_metadata($params)){
 									if(is_array($metadata)){
 										$access_id = $metadata[0]->access_id;
 									} else {
@@ -261,7 +265,7 @@
 								}
 								
 								// remove metadata to set new values
-								remove_metadata($user->getGUID(), $profile_field);
+								elgg_delete_metadata($params);
 								
 								// make new metadata field
 								if(!empty($temp_result)){
@@ -319,7 +323,7 @@
 									
 									if($user = get_user($user_guid)){
 										// register user's access tokens
-										set_plugin_usersetting('facebook_access_token', $token, $user_guid, "socialink");
+										elgg_set_plugin_user_setting('facebook_access_token', $token, $user_guid, "socialink");
 										
 										$result = $user;
 									}
@@ -344,7 +348,7 @@
 		$result = true;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		// can we get a user
@@ -366,4 +370,4 @@
 		}
 		return $result;		
 	}
-?>
+	

@@ -1,9 +1,5 @@
 <?php 
 
-	if(!class_exists("TwitterOAuth")){
-		require_once(dirname(dirname(dirname(__FILE__))) . "/vendors/twitteroauth/twitterOAuth.php");
-	}
-	
 	function socialink_twitter_get_api_object($keys){
 		$result = false;
 		
@@ -18,8 +14,9 @@
 				$oauth_token = null;
 				$oauth_secret = null;
 			}
-			
+			echo "1";
 			$result = new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
+			echo "2";
 		}
 		
 		return $result;
@@ -29,12 +26,12 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($user_guid) && ($keys = socialink_twitter_available())){
-			$oauth_token = get_plugin_usersetting("twitter_oauth_token", $user_guid, "socialink");
-			$oauth_secret = get_plugin_usersetting("twitter_oauth_secret", $user_guid, "socialink");
+			$oauth_token = elgg_get_plugin_user_setting("twitter_oauth_token", $user_guid, "socialink");
+			$oauth_secret = elgg_get_plugin_user_setting("twitter_oauth_secret", $user_guid, "socialink");
 			
 			if(!empty($oauth_token) && !empty($oauth_secret)){
 				$result = $keys;
@@ -50,7 +47,7 @@
 		global $SESSION;
 		
 		$result = false;
-	
+		
 		if($keys = socialink_twitter_available()){
 			if($api = socialink_twitter_get_api_object($keys)){
 				if($token = $api->getRequestToken($callback)){
@@ -96,42 +93,47 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		$oauth_verifier = get_input('oauth_verifier', NULL);
 		
 		if(!empty($user_guid) && ($token = socialink_twitter_get_access_token($oauth_verifier))){
 			
-			if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
+			if (isset($token["oauth_token"]) && isset($token["oauth_token_secret"])) {
 				// only one user per tokens
-				$values = array(
-					'plugin:settings:socialink:twitter_oauth_token' => $token['oauth_token'],
-					'plugin:settings:socialink:twitter_oauth_secret' => $token['oauth_token_secret']
+				$params = array(
+					"type" => "user",
+					"limit" => false,
+					"site_guids" => false,
+					"private_setting_name_value_pairs" => array(
+						"plugin:settings:socialink:twitter_oauth_token" => $token["oauth_token"],
+						"plugin:settings:socialink:twitter_oauth_secret" => $token["oauth_token_secret"]
+					)
 				);
-			
+				
 				// find hidden users (just created)
 				$access_status = access_get_show_hidden_status();
 				access_show_hidden_entities(true);
 				
-				if ($users = get_entities_from_private_setting_multi($values, 'user', '', 0, '', false, 0, false, -1)) {
+				if ($users = elgg_get_entities_from_private_settings($params)) {
 					foreach ($users as $user) {
 						// revoke access
-						set_plugin_usersetting('twitter_oauth_token', NULL, $user->getGUID(), "socialink");
-						set_plugin_usersetting('twitter_oauth_secret', NULL, $user->getGUID(), "socialink");
-						set_plugin_usersetting('twitter_screen_name', NULL, $user->getGUID(), "socialink");
-						set_plugin_usersetting('twitter_user_id', NULL, $user->getGUID(), "socialink");
+						elgg_unset_plugin_user_setting("twitter_oauth_token", $user->getGUID(), "socialink");
+						elgg_unset_plugin_user_setting("twitter_oauth_secret", $user->getGUID(), "socialink");
+						elgg_unset_plugin_user_setting("twitter_screen_name", $user->getGUID(), "socialink");
+						elgg_unset_plugin_user_setting("twitter_user_id", $user->getGUID(), "socialink");
 					}
 				}
 				
 				// restore hidden status
 				access_show_hidden_entities($access_status);
 					
-				// register user's access tokens
-				set_plugin_usersetting('twitter_user_id', $token['user_id'], $user_guid, "socialink");
-				set_plugin_usersetting('twitter_screen_name', $token['screen_name'], $user_guid, "socialink");
-				set_plugin_usersetting('twitter_oauth_token', $token['oauth_token'], $user_guid, "socialink");
-				set_plugin_usersetting('twitter_oauth_secret', $token['oauth_token_secret'], $user_guid, "socialink");
+				// register user"s access tokens
+				elgg_set_plugin_user_setting("twitter_user_id", $token["user_id"], $user_guid, "socialink");
+				elgg_set_plugin_user_setting("twitter_screen_name", $token["screen_name"], $user_guid, "socialink");
+				elgg_set_plugin_user_setting("twitter_oauth_token", $token["oauth_token"], $user_guid, "socialink");
+				elgg_set_plugin_user_setting("twitter_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
 				
 				$result = true;
 			}
@@ -144,14 +146,14 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($user_guid) && socialink_twitter_is_connected()){
-			set_plugin_usersetting("twitter_oauth_token", null, $user_guid, "socialink");
-			set_plugin_usersetting("twitter_oauth_secret", null, $user_guid, "socialink");
-			set_plugin_usersetting("twitter_screen_name", null, $user_guid, "socialink");
-			set_plugin_usersetting("twitter_user_id", null, $user_guid, "socialink");
+			elgg_unset_plugin_user_setting("twitter_oauth_token", $user_guid, "socialink");
+			elgg_unset_plugin_user_setting("twitter_oauth_secret", $user_guid, "socialink");
+			elgg_unset_plugin_user_setting("twitter_screen_name", $user_guid, "socialink");
+			elgg_unset_plugin_user_setting("twitter_user_id", $user_guid, "socialink");
 			
 			$result = true;
 		}
@@ -163,7 +165,7 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($message) && !empty($user_guid) && ($keys = socialink_twitter_is_connected($user_guid))){
@@ -182,14 +184,14 @@
 		$result = false;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		if(!empty($user_guid) && ($keys = socialink_twitter_is_connected($user_guid))){
 			if($api = socialink_twitter_get_api_object($keys)){
 				$url = "users/show";
 				$params = array(
-					"screen_name" => get_plugin_usersetting("twitter_screen_name", $user_guid, "socialink")
+					"screen_name" => elgg_get_plugin_user_setting("twitter_screen_name", $user_guid, "socialink")
 				);
 				
 				if($result = $api->get($url, $params)){
@@ -205,13 +207,13 @@
 		global $CONFIG;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		// can we get a user
 		if(($user = get_user($user_guid)) && socialink_twitter_is_connected($user_guid)){
 			// does the user allow sync
-			if(get_plugin_usersetting("twitter_sync_allow", $user->getGUID(), "socialink") != "no"){
+			if(elgg_get_plugin_user_setting("twitter_sync_allow", $user->getGUID(), "socialink") != "no"){
 				// get configured fields and network fields
 				if(($configured_fields = socialink_get_configured_network_fields("twitter")) && ($network_fields = socialink_get_network_fields("twitter"))){
 					// ask the api for all fields
@@ -221,7 +223,7 @@
 						foreach($configured_fields as $setting_name => $profile_field){
 							$setting = "twitter_sync_" . $setting_name;
 							
-							if(get_plugin_usersetting($setting, $user->getGUID(), "socialink") != "no"){
+							if(elgg_get_plugin_user_setting($setting, $user->getGUID(), "socialink") != "no"){
 								$api_setting = $network_fields[$setting_name];
 								
 								// get the correct value from api result
@@ -235,7 +237,13 @@
 								}
 								
 								// check if the user has this metadata field, to get access id
-								if($metadata = get_metadata_byname($user->getGUID(), $profile_field)){
+								$params = array(
+									"guid" => $user->getGUID(),
+									"metadata_name" => $profile_field,
+									"limit" => false
+								);
+								
+								if($metadata = elgg_get_metadata($params)){
 									if(is_array($metadata)){
 										$access_id = $metadata[0]->access_id;
 									} else {
@@ -246,7 +254,7 @@
 								}
 								
 								// remove metadata to set new values
-								remove_metadata($user->getGUID(), $profile_field);
+								elgg_delete_metadata($params);
 								
 								// make new metadata field
 								if(!empty($temp_result)){
@@ -306,10 +314,10 @@
 								
 								if($user = get_user($user_guid)){
 									// save user tokens
-									set_plugin_usersetting('twitter_user_id', $token['user_id'], $user_guid, "socialink");
-									set_plugin_usersetting('twitter_screen_name', $token['screen_name'], $user_guid, "socialink");
-									set_plugin_usersetting('twitter_oauth_token', $token['oauth_token'], $user_guid, "socialink");
-									set_plugin_usersetting('twitter_oauth_secret', $token['oauth_token_secret'], $user_guid, "socialink");
+									elgg_set_plugin_user_setting('twitter_user_id', $token['user_id'], $user_guid, "socialink");
+									elgg_set_plugin_user_setting('twitter_screen_name', $token['screen_name'], $user_guid, "socialink");
+									elgg_set_plugin_user_setting('twitter_oauth_token', $token['oauth_token'], $user_guid, "socialink");
+									elgg_set_plugin_user_setting('twitter_oauth_secret', $token['oauth_token_secret'], $user_guid, "socialink");
 									
 									// return the user
 									$result = $user;
@@ -334,7 +342,7 @@
 		$result = true;
 		
 		if(empty($user_guid)){
-			$user_guid = get_loggedin_userid();
+			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
 		// can we get a user
@@ -378,8 +386,8 @@
 				$SESSION["user"] = $user;
 				
 				if($keys = socialink_twitter_is_connected($user->getGUID())){
-					$since_id = get_plugin_usersetting("twitter_in_since_id", $user->getGUID(), "socialink");
-					$filter = get_plugin_usersetting("twitter_in_filter", $user->getGUID(), "socialink");
+					$since_id = elgg_get_plugin_user_setting("twitter_in_since_id", $user->getGUID(), "socialink");
+					$filter = elgg_get_plugin_user_setting("twitter_in_filter", $user->getGUID(), "socialink");
 					
 					if($api = socialink_twitter_get_api_object($keys)){
 						try {
@@ -432,7 +440,7 @@
 								}
 								
 								// update since_id
-								set_plugin_usersetting("twitter_in_since_id", $since_id, $user->getGUID(), "socialink");
+								elgg_set_plugin_user_setting("twitter_in_since_id", $since_id, $user->getGUID(), "socialink");
 							}
 						} catch(Exception $e){}
 					}
@@ -456,7 +464,7 @@
 				$value = $params["value"];
 				
 				if(($plugin == "socialink") && ($name = "twitter_in") && ($value == "yes")){
-					$prev = get_plugin_usersetting("twitter_in", $user->getGUID(), "socialink");
+					$prev = elgg_get_plugin_user_setting("twitter_in", $user->getGUID(), "socialink");
 					
 					if($prev != "yes"){
 						if($keys = socialink_twitter_is_connected($user->getGUID())){
@@ -472,7 +480,7 @@
 									
 									if(!empty($response) && empty($response->error)){
 										foreach($response as $tweet){
-											set_plugin_usersetting("twitter_in_since_id", $tweet->id_str, $user->getGUID(), "socialink");
+											elgg_set_plugin_user_setting("twitter_in_since_id", $tweet->id_str, $user->getGUID(), "socialink");
 											break;
 										}
 									}
@@ -488,6 +496,4 @@
 	}
 	
 	// register plugin hooks
-	register_plugin_hook("plugin:usersetting", "user", "socialink_twitter_usersettings_save");
-
-?>
+	elgg_register_plugin_hook_handler("plugin:usersetting", "user", "socialink_twitter_usersettings_save");

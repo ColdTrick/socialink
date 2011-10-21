@@ -1,0 +1,33 @@
+= SociaLink =
+Log in to your Elgg social network using LinkedIn, Twitter and/or Facebook
+
+== Contents ==
+1. Features
+2. External libaries
+3. ToDo
+
+== 1. Features ==
+- Connect to Facebook, LinkedIn and Twitter
+- Login (for registrered users) with social network account
+- Create an account based on Facebook, Twitter or LinkedIn (admin option)
+- Link profile data to Elgg profile
+
+
+== 2. External libaries ==
+=== Twitter OAuth ===
+- by Abraham Williams
+- URL: http://github.com/abraham/twitteroauth
+
+=== Facebook PHP SDK ===
+- by Facebook
+- URL: https://github.com/facebook/php-sdk
+
+=== Simple LinkedIn ===
+- by Paul Mennega
+- URL: http://code.google.com/p/simple-linkedinphp/
+
+=== OAuth PHP ===
+- URL: http://code.google.com/p/oauth/
+
+== 3. ToDo ==
+- if the wire to network, prevent twitter deadloops

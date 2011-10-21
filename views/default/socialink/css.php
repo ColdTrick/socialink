@@ -1,30 +1,6 @@
 <?php 
 
 ?>
-#socialink_settings_twitter,
-#socialink_settings_facebook,
-#socialink_settings_linkedin {
-	display: none;
-}
-
-#socialink_settings_twitter.socialink_settings_show,
-#socialink_settings_facebook.socialink_settings_show,
-#socialink_settings_linkedin.socialink_settings_show {
-	display: block;
-}
-
-#socialink_settings_twitter table,
-#socialink_settings_facebook table,
-#socialink_settings_linkedin table {
-	width: 100%;
-}
-
-#socialink_settings_twitter table th,
-#socialink_settings_facebook table th,
-#socialink_settings_linkedin table th {
-	text-align: left;
-}
-
 #socialink_usersettings_twitter_icon {
 	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/twitter/logo_withbird_90x17_allblue.png") transparent top left no-repeat;
 	width: 90px;
