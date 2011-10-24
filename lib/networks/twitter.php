@@ -14,9 +14,8 @@
 				$oauth_token = null;
 				$oauth_secret = null;
 			}
-			echo "1";
+			
 			$result = new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
-			echo "2";
 		}
 		
 		return $result;
@@ -49,8 +48,10 @@
 		$result = false;
 		
 		if($keys = socialink_twitter_available()){
+			
 			if($api = socialink_twitter_get_api_object($keys)){
-				if($token = $api->getRequestToken($callback)){
+				try {
+					$token = $api->getRequestToken($callback);
 					// save token in session for use after authorization
 					$SESSION['socialink_twitter'] = array(
 						'oauth_token' => $token['oauth_token'],
@@ -58,6 +59,8 @@
 					);
 				
 					$result = $api->getAuthorizeURL($token['oauth_token']);
+				} catch(Exception $e){
+					var_dump($e);
 				}
 			}
 		}
@@ -106,9 +109,10 @@
 					"type" => "user",
 					"limit" => false,
 					"site_guids" => false,
-					"private_setting_name_value_pairs" => array(
-						"plugin:settings:socialink:twitter_oauth_token" => $token["oauth_token"],
-						"plugin:settings:socialink:twitter_oauth_secret" => $token["oauth_token_secret"]
+					"plugin_id" => "socialink",
+					"plugin_user_setting_name_value_pairs" => array(
+						"twitter_oauth_token" => $token["oauth_token"],
+						"twitter_oauth_secret" => $token["oauth_token_secret"]
 					)
 				);
 				
@@ -116,7 +120,7 @@
 				$access_status = access_get_show_hidden_status();
 				access_show_hidden_entities(true);
 				
-				if ($users = elgg_get_entities_from_private_settings($params)) {
+				if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
 					foreach ($users as $user) {
 						// revoke access
 						elgg_unset_plugin_user_setting("twitter_oauth_token", $user->getGUID(), "socialink");

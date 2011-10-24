@@ -12,18 +12,18 @@
 	}
 
 ?>
-<div class="contentWrapper">
-	<div><?php echo sprintf(elgg_echo("socialink:create_account:description"), $network_string); ?></div>
-	<br />
-	
-	<div id="socialink_no_linked_account_container">
-		<div id="socialink_link_account_wrapper"><?php echo $link_form; ?></div>
+<div><?php echo sprintf(elgg_echo("socialink:create_account:description"), $network_string); ?></div>
+<br />
+
+<div id="socialink_no_linked_account_container">
+	<?php 
+		echo $link_form; 
 		
-		<?php if(!empty($create_form)){ ?>
+		if(!empty($create_form)){ 
+	?>
 		<div id="socialink_no_linked_account_spacer"><?php echo strtoupper(elgg_echo("socialink:or")); ?></div>
-		<div id="socialink_create_account_wrapper"><?php echo $create_form; ?></div>
-		<?php } ?>
-		
-		<div class="clearfloat"></div>
-	</div>
+	<?php 
+		echo $create_form; 
+		} 
+	?>
 </div>

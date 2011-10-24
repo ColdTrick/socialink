@@ -130,9 +130,6 @@
 			<div><?php echo elgg_echo("socialink:settings:facebook:api:app_secret"); ?></div>
 			<?php echo elgg_view("input/text", array("name" => "params[facebook_app_secret]", "value" => $plugin->facebook_app_secret)); ?>
 			
-			<div><?php echo elgg_echo("socialink:settings:facebook:api:api_key"); ?></div>
-			<?php echo elgg_view("input/text", array("name" => "params[facebook_api_key]", "value" => $plugin->facebook_api_key)); ?>
-			
 			<br /><br />
 			
 			<div><?php echo elgg_echo("socialink:settings:facebook:allow_login"); ?></div>

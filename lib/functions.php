@@ -32,13 +32,11 @@
 		if(elgg_get_plugin_setting("enable_facebook", "socialink") == "yes"){
 			$app_id = elgg_get_plugin_setting("facebook_app_id", "socialink");
 			$app_secret = elgg_get_plugin_setting("facebook_app_secret", "socialink");
-			$api_key = elgg_get_plugin_setting("facebook_api_key", "socialink");
 			
-			if(!empty($app_id) && !empty($app_secret) && !empty($api_key)){
+			if(!empty($app_id) && !empty($app_secret)){
 				$result = array(
 					"app_id" => $app_id,
-					"app_secret" => $app_secret,
-					"api_key" => $api_key
+					"app_secret" => $app_secret
 				);
 			}
 		}

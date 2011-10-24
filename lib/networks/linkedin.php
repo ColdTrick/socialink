@@ -139,9 +139,10 @@
 					"type" => "user",
 					"limit" => false,
 					"site_guids" => false,
-					"private_setting_name_value_pairs" => array(
-						"plugin:settings:socialink:linkedin_oauth_token" => $token["oauth_token"],
-						"plugin:settings:socialink:linkedin_oauth_secret" => $token["oauth_token_secret"],
+					"plugin_id" => "socialink",
+					"plugin_user_setting_name_value_pairs" => array(
+						"linkedin_oauth_token" => $token["oauth_token"],
+						"linkedin_oauth_secret" => $token["oauth_token_secret"],
 					)
 				);
 				
@@ -149,7 +150,7 @@
 				$access_status = access_get_show_hidden_status();
 				access_show_hidden_entities(true);
 				
-				if ($users = elgg_get_entities_from_private_settings($params)) {
+				if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
 					foreach ($users as $user) {
 						// revoke access
 						elgg_unset_plugin_user_setting("linkedin_oauth_token", $user->getGUID(), "socialink");

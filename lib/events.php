@@ -60,15 +60,15 @@
 	
 				$SESSION->offsetUnset("socialink_token");
 			}
-				
+			
 			// check if network connections are still valid
 			$networks = socialink_get_user_networks($entity->getGUID());
 			if(!empty($networks)){
 				foreach($networks as $network){
 					$response = socialink_validate_network($network, $entity->getGUID());
+					
 					if($response === false){
 						// disconnect from this network and report to user
-	
 						call_user_func("socialink_" . $network . "_remove_connection", $entity->getGUID());
 						register_error(sprintf(elgg_echo("socialink:network_invalid"), elgg_echo("socialink:network:" . $network)));
 					}

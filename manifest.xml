@@ -23,5 +23,10 @@
 		<name>curl</name>
 	</requires>
 	
+	<conflicts>
+		<type>plugin</type>
+		<name>oauth_api</name>
+	</conflicts>
+	
  	<category>ColdTrick</category>
 </plugin_manifest>

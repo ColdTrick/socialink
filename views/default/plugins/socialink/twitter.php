@@ -21,7 +21,7 @@
 		$link_begin = "<a href='" . $twitter_remove_link . "'>";
 		$link_end = "</a>";
 		
-		echo "<div>" . sprintf(elgg_echo("socialink:usersettings:twitter:remove"), $twitter_screen_name, $link_begin, $link_end) . "</div>";
+		echo "<div>" . elgg_echo("socialink:usersettings:twitter:remove", array($twitter_screen_name, $link_begin, $link_end)) . "</div>";
 		
 		// check for the wire
 //		if(is_plugin_enabled("thewire")){
@@ -37,7 +37,7 @@
 			
 			echo "<br />";
 			echo "<div>";
-			echo sprintf(elgg_echo("socialink:usersettings:profile_sync"), $network_name);
+			echo elgg_echo("socialink:usersettings:profile_sync", array($network_name));
 			echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[twitter_sync_allow]", "options_values" => array_reverse($noyes_options_values), "value" => $usersettings->twitter_sync_allow, "js" => "onchange='socialink_toggle_network_configure(this, \"twitter\");'"));
 			echo "&nbsp;<span id='socialink_twitter_sync_configure' ";
 			if($usersettings->twitter_sync_allow != "no"){
@@ -46,9 +46,9 @@
 			echo "><a href='javascript:void(0);' onclick='$(\"#socialink_twitter_sync_fields\").toggle();'>" . elgg_echo("socialink:configure") . "</a></span>";
 			echo "</div>";
 			
-			echo "<table id='socialink_twitter_sync_fields'>";
+			echo "<table id='socialink_twitter_sync_fields' class='elgg-table'>";
 			echo "<tr>";
-			echo "<th>" . sprintf(elgg_echo("socialink:usersettings:profile_field"), $network_name) . "</th>";
+			echo "<th>" . elgg_echo("socialink:usersettings:profile_field", array($network_name)) . "</th>";
 			echo "<th>" . elgg_echo("socialink:usersettings:profile_sync:allow") . "</th>";
 			echo "<tr>";
 			
@@ -64,7 +64,7 @@
 				}
 				
 				echo "<tr>";
-				echo "<td>" . sprintf(elgg_echo("socialink:usersettings:profile_sync:explain"), $network_string, $profile_string) . "</td>";
+				echo "<td>" . elgg_echo("socialink:usersettings:profile_sync:explain", array($network_string, $profile_string)) . "</td>";
 				echo "<td>" . elgg_view("input/dropdown", array("name" => "params[" . $setting . "]", "options_values" => array_reverse($noyes_options_values, true), "value" => $usersettings->$setting)) . "</td>";
 				echo "<tr>";
 			}
@@ -93,7 +93,7 @@
 		$link_begin = "<a href='" . $vars["url"] . "socialink/forward/twitter/authorize' target='_self'>";
 		$link_end = "</a>";
 		
-		echo sprintf(elgg_echo("socialink:usersettings:twitter:not_connected"), $link_begin, $link_end);
+		echo elgg_echo("socialink:usersettings:twitter:not_connected", array($link_begin, $link_end));
 	}
 	echo "</div>";
 	echo "<div class='clearfloat'></div>";

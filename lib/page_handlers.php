@@ -7,7 +7,7 @@
 			case "authorize":
 				gatekeeper();
 	
-				$user = get_loggedin_user();
+				$user = elgg_get_logged_in_user_entity();
 	
 				switch($page[1]){
 					case "twitter":
@@ -34,123 +34,127 @@
 				}
 	
 				if(!empty($page[1]) && socialink_is_available_network($page[1])){
-					trigger_plugin_hook("socialink:sync", "user", array("user" => $user, "network" => $page[1]));
+					elgg_trigger_plugin_hook("socialink:sync", "user", array("user" => $user, "network" => $page[1]));
 				}
 	
-				forward("pg/settings/plugins/" . $user->username);
+				forward("settings/plugins/" . $user->username);
 				break;
 			case "login":
-				if(!isloggedin() && isset($page[1])){
+				if(!elgg_is_logged_in() && isset($page[1])){
 					$network = $page[1];
 					$network_name = elgg_echo("socialink:network:" . $network);
 						
-					$error_msg_no_user = sprintf(elgg_echo("socialink:login:error:no_user"), $network_name, $network_name);
+					$error_msg_no_user = elgg_echo("socialink:login:error:no_user", array($network_name, $network_name));
 						
 					// find hidden users (just created)
 					$access_status = access_get_show_hidden_status();
 					access_show_hidden_entities(true);
-						
+					
 					switch($network){
 						case "twitter":
-							$token = socialink_twitter_get_access_token(get_input('oauth_verifier'));
-								
-							if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
-								$values = array(
-										'plugin:settings:socialink:twitter_oauth_token' => $token['oauth_token'],
-										'plugin:settings:socialink:twitter_oauth_secret' => $token['oauth_token_secret']
+							$token = socialink_twitter_get_access_token(get_input("oauth_verifier"));
+							
+							if (isset($token["oauth_token"]) && isset($token["oauth_token_secret"])) {
+								$params = array(
+									"type" => "user",
+									"limit" => 1,
+									"site_guids" => false,
+									"plugin_id" => "socialink",
+									"plugin_user_setting_name_value_pairs" => array(
+										"twitter_oauth_token" => $token["oauth_token"],
+										"twitter_oauth_secret" => $token["oauth_token_secret"]
+									)
 								);
-	
-								if ($users = get_entities_from_private_setting_multi($values, 'user', '', 0, '', 1, 0, false, -1)) {
+								
+								
+								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
 									$user = $users[0];
 								} else {
 									$_SESSION["socialink_token"] = $token;
-									forward("pg/socialink/no_linked_account/twitter");
+									forward("socialink/no_linked_account/twitter");
 								}
 							} else {
 								register_error($error_msg_no_user);
 							}
 							break;
 						case "linkedin":
-							$token = socialink_linkedin_get_access_token(get_input('oauth_verifier'));
+							$token = socialink_linkedin_get_access_token(get_input("oauth_verifier"));
 								
-							if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
-								$values = array(
-										'plugin:settings:socialink:linkedin_oauth_token' => $token['oauth_token'],
-										'plugin:settings:socialink:linkedin_oauth_secret' => $token['oauth_token_secret']
+							if (isset($token["oauth_token"]) && isset($token["oauth_token_secret"])) {
+								$params = array(
+									"type" => "user",
+									"limit" => 1,
+									"site_guids" => false,
+									"plugin_id" => "socialink",
+									"plugin_user_setting_name_value_pairs" => array(
+										"linkedin_oauth_token" => $token["oauth_token"],
+										"linkedin_oauth_secret" => $token["oauth_token_secret"]
+									)
 								);
-								if ($users = get_entities_from_private_setting_multi($values, 'user', '', 0, '', 1, 0, false, -1)) {
+								
+								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
 									$user = $users[0];
 								} else {
 									$_SESSION["socialink_token"] = $token;
-									forward("pg/socialink/no_linked_account/linkedin");
+									forward("socialink/no_linked_account/linkedin");
 								}
 							} else {
 								register_error($error_msg_no_user);
 							}
 							break;
 						case "facebook":
-							$state = get_input('state', NULL);
+							$state = get_input("state", NULL);
 								
 							if($token = socialink_facebook_get_access_token($state)){
-								$values = array(
-										'plugin:settings:socialink:facebook_access_token' => $token
+								$params = array(
+									"type" => "user",
+									"limit" => 1,
+									"site_guids" => false,
+									"plugin_id" => "socialink",
+									"plugin_user_setting_name_value_pairs" =>  array(
+										"facebook_access_token" => $token
+									)
 								);
-									
-								if ($users = get_entities_from_private_setting_multi($values, 'user', '', 0, '', 1, 0, false, -1)) {
+								
+								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
 									$user = $users[0];
 								} else {
 									$_SESSION["socialink_token"] = $token;
-									forward("pg/socialink/no_linked_account/facebook");
+									forward("socialink/no_linked_account/facebook");
 								}
 							} else {
 								register_error($error_msg_no_user);
 							}
 							break;
 					}
-						
+					
 					if($user instanceof ElggUser){
-						$hold = false;
-	
-						if($user->isBanned()){
-							$hold = true;
-						}
-	
-						if(!$user->isAdmin() && !$user->validated){
-							$hold = true;
-								
-							// give plugins a chance to respond
-							if (!trigger_plugin_hook('unvalidated_login_attempt','user',array('entity' => $user))) {
-								// if plugins have not registered an action, the default action is to
-								// trigger the validation event again and assume that the validation
-								// event will display an appropriate message
-								trigger_elgg_event('validate', 'user', $user);
+						
+						try {
+							// permanent login
+							login($user, true);
+							
+							// log last network
+							elgg_set_plugin_user_setting("last_login_network", $network, $user->getGUID(), "socialink");
+
+							// sync network data
+							elgg_trigger_plugin_hook("socialink:sync", "user", array("user" => $user, "network" => $network));
+
+							// set message and forward to correct page
+							system_message(elgg_echo("loginok"));
+
+							if (isset($_SESSION["last_forward_from"]) && $_SESSION["last_forward_from"]) {
+								$forward_url = $_SESSION["last_forward_from"];
+								unset($_SESSION["last_forward_from"]);
+								forward($forward_url);
+							} elseif (get_input("returntoreferer")) {
+								forward(REFERER);
+							} else {
+								forward();
 							}
-						}
-	
-						if(!$hold){
-							if(login($user, true)){
-								// permanent login
-								// log last network
-								set_plugin_usersetting("last_login_network", $network, $user->getGUID(), "socialink");
-	
-								// sync network data
-								trigger_plugin_hook("socialink:sync", "user", array("user" => $user, "network" => $network));
-	
-								// set message and forward to correct page
-								system_message(elgg_echo('loginok'));
-	
-								if (isset($_SESSION['last_forward_from']) && $_SESSION['last_forward_from']) {
-									$forward_url = $_SESSION['last_forward_from'];
-									unset($_SESSION['last_forward_from']);
-									forward($forward_url);
-								} elseif (get_input('returntoreferer')) {
-									forward($_SERVER['HTTP_REFERER']);
-								} else {
-									forward("pg/dashboard/");
-								}
-							}
-						} else {
-							register_error(elgg_echo('loginerror'));
+						} catch (LoginException $e) {
+							register_error($e->getMessage());
+							forward();
 						}
 					}
 						
@@ -159,20 +163,21 @@
 				}
 				break;
 			case "no_linked_account":
-				if(!isloggedin()){
+				if(!elgg_is_logged_in()){
 					switch($page[1]){
 						case "linkedin":
 						case "facebook":
 						case "twitter":
 							set_input("network", $page[1]);
-							include(dirname(__FILE__) . "/pages/no_linked_account.php");
+							include(dirname(dirname(__FILE__)) . "/pages/no_linked_account.php");
+							
 							break;
 					}
 				}
 				break;
 			case "share":
-				if(isloggedin()){
-					include(dirname(__FILE__) . "/pages/share.php");
+				if(elgg_is_logged_in()){
+					include(dirname(dirname(__FILE__)) . "/pages/share.php");
 					exit();
 				}
 				break;

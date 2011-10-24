@@ -24,5 +24,4 @@
 	} else {
 		echo elgg_echo("socialink:usersettings:no_access");
 	}
-
-?>
+	

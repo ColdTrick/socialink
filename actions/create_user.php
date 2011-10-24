@@ -4,7 +4,7 @@
 	
 	$forward_url = REFERER;
 	
-	if(!isloggedin() && !empty($_SESSION["socialink_token"])){
+	if(!elgg_is_logged_in() && !empty($_SESSION["socialink_token"])){
 		$token = $_SESSION["socialink_token"];
 		
 		$network = get_input("network");
@@ -46,7 +46,7 @@
 				// user is validated, so login
 				if(login($user)){
 					// log last network
-					set_plugin_usersetting("last_login_network", $network, $user->getGUID(), "socialink");
+					elgg_set_plugin_user_setting("last_login_network", $network, $user->getGUID(), "socialink");
 					
 					// check if we need to forward to something
 					if (!empty($_SESSION['last_forward_from'])) {
@@ -64,4 +64,4 @@
 	}
 
 	forward($forward_url);
-?>
+	

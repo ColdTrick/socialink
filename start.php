@@ -4,21 +4,10 @@
 	require_once(dirname(__FILE__) . "/lib/hooks.php");
 	require_once(dirname(__FILE__) . "/lib/events.php");
 	require_once(dirname(__FILE__) . "/lib/page_handlers.php");
-
+	
 	function socialink_init(){
 		// prepare vendor libaries
-		// regsiter OAuth libraries
-		elgg_register_class("OAuthException", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthConsumer", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthToken", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthSignatureMethod", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthSignatureMethod_HMAC_SHA1", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthSignatureMethod_PLAINTEXT", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthSignatureMethod_RSA_SHA1", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthRequest", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthServer", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthDataStore", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
-		elgg_register_class("OAuthUtil", dirname(__FILE__) . "/vendors/oauth/OAuth.php");
+		elgg_register_classes(dirname(__FILE__) . "/vendors/oauth/classes");
 		
 		// register Social libraries
 		elgg_register_class("Facebook", dirname(__FILE__) . "/vendors/facebook_php_sdk/src/facebook.php");
@@ -31,14 +20,14 @@
 		elgg_register_library("socialink:twitter", dirname(__FILE__) . "/lib/networks/twitter.php");
 		
 		// extend CSS
-		elgg_extend_view("css", "socialink/css");
+		elgg_extend_view("css/elgg", "socialink/css/site");
 		elgg_extend_view("css/admin", "socialink/css/admin");
 		
 		// extend JS
 		elgg_extend_view("js/initialise_elgg", "socialink/js");
 		
 		// extend login box
-		elgg_extend_view("account/forms/login", "socialink/login");
+		elgg_extend_view("forms/login", "socialink/login");
 		
 		// register page handler
 		elgg_register_page_handler("socialink", "socialink_page_handler");

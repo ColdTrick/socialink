@@ -125,8 +125,9 @@
 				"type" => "user",
 				"limit" => false,
 				"site_guids" => false,
-				"private_setting_name_value_pairs" => array(
-					"plugin:settings:socialink:facebook_access_token" => $token
+				"plugin_id" => "socialink",
+				"plugin_user_setting_name_value_pairs" => array(
+					"facebook_access_token" => $token
 				)
 			);
 			
@@ -134,7 +135,7 @@
 			$access_status = access_get_show_hidden_status();
 			access_show_hidden_entities(true);
 			
-			if ($users = elgg_get_entities_from_private_settings($params)) {
+			if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
 				foreach ($users as $user) {
 					// revoke access
 					elgg_unset_plugin_user_setting("facebook_access_token", $user->getGUID(), "socialink");
