@@ -1,5 +1,5 @@
 = Version history =
-x.x:
+1.0 beta 1 (2011-10-25):
 
 - changed: Facebook PHP SDK to version 3.1.1 (was 2.1.2)
 - changed: LinkedIn libary to version 3.1.1 (was 3.0.1)
