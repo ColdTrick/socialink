@@ -4,6 +4,7 @@ x.x:
 - changed: Facebook PHP SDK to version 3.1.1 (was 2.1.2)
 - changed: LinkedIn libary to version 3.1.1 (was 3.0.1)
 - changed: OAuth libary moved to own folder
+- changed: plugin now Elgg 1.8 ready
 
 0.5.1 (2011-08-05):
 

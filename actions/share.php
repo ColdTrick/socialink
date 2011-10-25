@@ -4,7 +4,7 @@
 	$network = get_input("network");
 	
 	$max_length = 140;
-	if($user_guid = get_loggedin_userid()){
+	if($user_guid = elgg_get_logged_in_user_guid()){
 		if(!empty($message) && !empty($network)){
 			if(socialink_is_supported_network($network)){
 				if(strlen($message) < $max_length){
@@ -14,5 +14,6 @@
 			}
 		}
 	}
+	
 	exit();
-?>
+	

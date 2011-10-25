@@ -24,7 +24,7 @@
 		elgg_extend_view("css/admin", "socialink/css/admin");
 		
 		// extend JS
-		elgg_extend_view("js/initialise_elgg", "socialink/js");
+		elgg_extend_view("js/elgg", "socialink/js");
 		
 		// extend login box
 		elgg_extend_view("forms/login", "socialink/login");
@@ -48,17 +48,9 @@
 		}
 	}
 	
-	function socialink_pagesetup(){
-		// use fancybox
-		elgg_load_js("lightbox");
-		elgg_load_css("lightbox");
-		
-	}
-	
 	// register default Elgg events
 	elgg_register_event_handler("init", "system", "socialink_init");
-	elgg_register_event_handler("pagesetup", "system", "socialink_pagesetup");
-
+	
 	// register event handlers
 	//register_elgg_event_handler("create", "object", "socialink_create_object_handler");
 	elgg_register_event_handler("validate", "user", "socialink_validate_user_handler", 450);

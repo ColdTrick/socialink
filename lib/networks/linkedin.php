@@ -363,8 +363,18 @@
 									elgg_set_plugin_user_setting('linkedin_oauth_token', $token['oauth_token'], $user_guid, "socialink");
 									elgg_set_plugin_user_setting('linkedin_oauth_secret', $token['oauth_token_secret'], $user_guid, "socialink");
 									
-									// return the user
-									$result = $user;
+									// trigger hook for registration
+									$params = array(
+										"user" => $user,
+										"password" => $pwd,
+										"friend_guid" => 0,
+										"invitecode" => ""
+									);
+									
+									if(elgg_trigger_plugin_hook("register", "user", $params, true) !== false){
+										// return the user
+										$result = $user;
+									}
 								}
 								
 								// restore hidden entities

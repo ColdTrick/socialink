@@ -1,7 +1,5 @@
 <?php 
 
-	global $CONFIG;
-	
 	$forward_url = REFERER;
 	
 	if(!elgg_is_logged_in() && !empty($_SESSION["socialink_token"])){
@@ -33,31 +31,25 @@
 			unset($_SESSION["socialink_token"]);
 			
 			// notify the user
-			system_message(sprintf(elgg_echo("registerok"), $CONFIG->sitename));
+			system_message(elgg_echo("registerok", array(elgg_get_site_entity()->name)));
 			
-			// request validation on this email address
-			request_user_validation($user->getGUID());
-			
-			// reload user
-			invalidate_cache_for_entity($user->getGUID());
-			$user = get_user($user->getGUID());
-			
-			if($user->isEnabled() && $user->validated){
+			try {
 				// user is validated, so login
 				if(login($user)){
 					// log last network
 					elgg_set_plugin_user_setting("last_login_network", $network, $user->getGUID(), "socialink");
 					
 					// check if we need to forward to something
-					if (!empty($_SESSION['last_forward_from'])) {
-						$forward_url = $_SESSION['last_forward_from'];
-						unset($_SESSION['last_forward_from']);
+					if (!empty($_SESSION["last_forward_from"])) {
+						$forward_url = $_SESSION["last_forward_from"];
+						unset($_SESSION["last_forward_from"]);
 					}
 				}
-			} else {
-				// disable the user until validated
-				$user->disable('new_user', false);
+			} catch (Exception $e){
+				register_error($e->getMessage());
 			}
+		} else {
+			register_error(elgg_echo("registerbad"));
 		}
 	} else {
 		register_error(elgg_echo("socialink:actions:create_user:error:loggedin"));

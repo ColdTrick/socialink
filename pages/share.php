@@ -2,13 +2,13 @@
 
 	global $CONFIG;
 
-	if(isloggedin()){
+	if(elgg_is_logged_in()){
 		$url = get_input("url");
 		$title = get_input("title");
 		$max_length = 140;
 		
 		if(!empty($url)){
-			$url = trigger_plugin_hook("shorten", "url", array("url" => $url), $url);
+			$url = elgg_trigger_plugin_hook("shorten", "url", array("url" => $url), $url);
 		}
 		
 		$message = html_entity_decode($title) . " (" . $url . ")"; 
@@ -60,4 +60,4 @@
 			<?php 
 		}
 	}
-?>
+	

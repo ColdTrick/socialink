@@ -326,7 +326,21 @@
 										// register user's access tokens
 										elgg_set_plugin_user_setting('facebook_access_token', $token, $user_guid, "socialink");
 										
-										$result = $user;
+										// no need for uservalidationbyemail
+										elgg_unregister_plugin_hook_handler("register", "user", "uservalidationbyemail_disable_new_user");
+										
+										// trigger hook for registration
+										$params = array(
+											"user" => $user,
+											"password" => $pwd,
+											"friend_guid" => 0,
+											"invitecode" => ""
+										);
+										
+										if(elgg_trigger_plugin_hook("register", "user", $params, true) !== false){
+											// return the user
+											$result = $user;
+										}
 									}
 									
 									// restore hidden entities

@@ -12,7 +12,6 @@ Log in to your Elgg social network using LinkedIn, Twitter and/or Facebook
 - Create an account based on Facebook, Twitter or LinkedIn (admin option)
 - Link profile data to Elgg profile
 
-
 == 2. External libaries ==
 === Twitter OAuth ===
 - by Abraham Williams
@@ -30,4 +29,7 @@ Log in to your Elgg social network using LinkedIn, Twitter and/or Facebook
 - URL: http://code.google.com/p/oauth/
 
 == 3. ToDo ==
-- if the wire to network, prevent twitter deadloops
+- Post to The Wire
+- Twitter in
+- If The Wire to network, prevent twitter deadloops
+- Share content on social networks
