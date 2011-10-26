@@ -11,24 +11,13 @@
 	
 				switch($page[1]){
 					case "twitter":
-						if(socialink_twitter_authorize()){
-							system_message(elgg_echo("socialink:authorize:twitter:success"));
-						} else {
-							register_error(elgg_echo("socialink:authorize:twitter:failed"));
-						}
-						break;
 					case "linkedin":
-						if(socialink_linkedin_authorize()){
-							system_message(elgg_echo("socialink:authorize:linkedin:success"));
-						} else {
-							register_error(elgg_echo("socialink:authorize:linkedin:failed"));
-						}
-						break;
 					case "facebook":
-						if(socialink_facebook_authorize()){
-							system_message(elgg_echo("socialink:authorize:facebook:success"));
+					case "hyves":
+						if(call_user_func("socialink_" . $page[1] . "_authorize")){
+							system_message(elgg_echo("socialink:authorize:success", array(elgg_echo("socialink:network:" . $page[1]))));
 						} else {
-							register_error(elgg_echo("socialink:authorize:facebook:failed"));
+							register_error(elgg_echo("socialink:authorize:failed", array(elgg_echo("socialink:network:" . $page[1]))));
 						}
 						break;
 				}
@@ -126,6 +115,31 @@
 								register_error($error_msg_no_user);
 							}
 							break;
+						case "hyves":
+							$token = socialink_hyves_get_access_token(get_input("oauth_verifier"));
+							
+							if($token->getKey() && $token->getSecret()){
+								$params = array(
+									"type" => "user",
+									"limit" => 1,
+									"site_guids" => false,
+									"plugin_id" => "socialink",
+									"plugin_user_setting_name_value_pairs" => array(
+										"hyves_oauth_token" => $token->getKey(),
+										"hyves_oauth_secret" => $token->getSecret()
+									)
+								);
+								
+								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
+									$user = $users[0];
+								} else {
+									$_SESSION["socialink_token"] = serialize($token);
+									forward("socialink/no_linked_account/hyves");
+								}
+							} else {
+								register_error($error_msg_no_user);
+							}
+							break;
 					}
 					
 					if($user instanceof ElggUser){
@@ -168,6 +182,7 @@
 						case "linkedin":
 						case "facebook":
 						case "twitter":
+						case "hyves":
 							set_input("network", $page[1]);
 							include(dirname(dirname(__FILE__)) . "/pages/no_linked_account.php");
 							
@@ -201,6 +216,9 @@
 								break;
 							case "twitter":
 								$forward_url = socialink_twitter_get_authorize_url($callback_url);
+								break;
+							case "hyves":
+								$forward_url = socialink_hyves_get_authorize_url($callback_url);
 								break;
 						}
 	

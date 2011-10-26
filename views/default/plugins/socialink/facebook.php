@@ -2,7 +2,7 @@
 	$user = $vars["user"];
 	$usersettings = $vars["entity"];
 	
-	// for yes/no pulldowns
+	// for yes/no dropdowns
 	$yesno_options_values = array(
 		"no" => elgg_echo("option:no"),
 		"yes" => elgg_echo("option:yes")
@@ -25,7 +25,7 @@
 //		if(is_plugin_enabled("thewire")){
 //			echo "<div>";
 //			echo elgg_echo("socialink:usersettings:facebook:thewire");
-//			echo "&nbsp;" . elgg_view("input/pulldown", array("internalname" => "params[thewire_post_facebook]", "options_values" => $yesno_options_values, "value" => $usersettings->thewire_post_facebook));
+//			echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[thewire_post_facebook]", "options_values" => $yesno_options_values, "value" => $usersettings->thewire_post_facebook));
 //			echo "</div>";
 //		}
 		
@@ -36,7 +36,7 @@
 			echo "<br />";
 			echo "<div>";
 			echo elgg_echo("socialink:usersettings:profile_sync", array($network_name));
-			echo "&nbsp;" . elgg_view("input/pulldown", array("internalname" => "params[facebook_sync_allow]", "options_values" => array_reverse($yesno_options_values), "value" => $usersettings->facebook_sync_allow, "js" => "onchange='socialink_toggle_network_configure(this, \"facebook\");'"));
+			echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[facebook_sync_allow]", "options_values" => array_reverse($yesno_options_values), "value" => $usersettings->facebook_sync_allow, "js" => "onchange='socialink_toggle_network_configure(this, \"facebook\");'"));
 			echo "&nbsp;<span id='socialink_facebook_sync_configure' ";
 			if($usersettings->facebook_sync_allow != "no"){
 				echo "class='socialink_network_sync_allow'";
@@ -63,7 +63,7 @@
 				
 				echo "<tr>";
 				echo "<td>" . elgg_echo("socialink:usersettings:profile_sync:explain", array($network_string, $profile_string)) . "</td>";
-				echo "<td>" . elgg_view("input/pulldown", array("internalname" => "params[" . $setting . "]", "options_values" => array_reverse($yesno_options_values, true), "value" => $usersettings->$setting)) . "</td>";
+				echo "<td>" . elgg_view("input/dropdown", array("name" => "params[" . $setting . "]", "options_values" => array_reverse($yesno_options_values, true), "value" => $usersettings->$setting)) . "</td>";
 				echo "<tr>";
 			}
 			

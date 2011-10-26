@@ -21,6 +21,11 @@
 				$user = socialink_facebook_create_user($token);
 				
 				break;
+			case "hyves":
+				$token = unserialize($token);
+				$user = socialink_hyves_create_user($token, $email);
+				
+				break;
 			default:
 				register_error(elgg_echo("socialink:actions:create_user:error:network"));
 				break;

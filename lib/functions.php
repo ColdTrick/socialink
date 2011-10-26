@@ -61,9 +61,27 @@
 		
 		return $result;
 	}
+	
+	function socialink_hyves_available(){
+		$result = false;
+		
+		if(elgg_get_plugin_setting("enable_hyves", "socialink") == "yes"){
+			$consumer_key = elgg_get_plugin_setting("hyves_consumer_key", "socialink");
+			$consumer_secret = elgg_get_plugin_setting("hyves_consumer_secret", "socialink");
+			
+			if(!empty($consumer_key) && !empty($consumer_secret)){
+				$result = array(
+					"consumer_key" => $consumer_key,
+					"consumer_secret" => $consumer_secret,
+				);
+			}
+		}
+		
+		return $result;
+	}
 
 	function socialink_get_supported_networks(){
-		return array("twitter", "linkedin", "facebook");
+		return array("twitter", "linkedin", "facebook", "hyves");
 	}
 	
 	function socialink_is_supported_network($network){
@@ -175,6 +193,16 @@
 					"about" => "about",
 					"bio" => "bio",
 					"hometown" => "hometown"
+				),
+				"hyves" => array(
+					"name" => "displayname",
+					"firstname" => "firstname",
+					"lastname" => "lastname",
+					"profile_url" => "url",
+					"gender" => "gender",
+					"city" => "cityname",
+					"country" => "countryname",
+					"about" => "aboutme"
 				)
 			);
 			

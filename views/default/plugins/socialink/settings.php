@@ -31,17 +31,6 @@
 		}
 	}
 	
-	
-	if($plugin->enable_twitter == "yes"){
-		$twitter_show = "socialink_settings_show";
-	}
-	if($plugin->enable_facebook == "yes"){
-		$facebook_show = "socialink_settings_show";
-	}
-	if($plugin->enable_linkedin == "yes"){
-		$linkedin_show = "socialink_settings_show";
-	}
-	
 ?>
 <div>
 	<table>
@@ -56,6 +45,10 @@
 		<tr>
 			<td><?php echo elgg_echo("socialink:settings:enable:linkedin"); ?>&nbsp;</td>
 			<td><?php echo elgg_view("input/dropdown", array("name" => "params[enable_linkedin]", "value" => $plugin->enable_linkedin, "options_values" => $yesno_options)); ?></td>
+		</tr>
+		<tr>
+			<td><?php echo elgg_echo("socialink:settings:enable:hyves"); ?>&nbsp;</td>
+			<td><?php echo elgg_view("input/dropdown", array("name" => "params[enable_hyves]", "value" => $plugin->enable_hyves, "options_values" => $yesno_options)); ?></td>
 		</tr>
 	</table>
 </div>
@@ -214,6 +207,54 @@
 		</div>
 	</div>
 	<!-- End LinkedIn settings -->
+	
+	<!-- hyves settings -->
+	<div id="socialink_settings_hyves" class="elgg-module elgg-module-info <?php echo $hyves_show; ?>">
+		<div class="elgg-head"><h3><?php echo elgg_echo("socialink:settings:hyves:header"); ?></h3></div>
+		
+		<div class="elgg-body">
+			<div><?php echo elgg_echo("socialink:settings:hyves:api:consumer_key"); ?></div>
+			<?php echo elgg_view("input/text", array("name" => "params[hyves_consumer_key]", "value" => $plugin->hyves_consumer_key)); ?>
+			
+			<div><?php echo elgg_echo("socialink:settings:hyves:api:consumer_secret"); ?></div>
+			<?php echo elgg_view("input/text", array("name" => "params[hyves_consumer_secret]", "value" => $plugin->hyves_consumer_secret)); ?>
+			
+			<br /><br />
+			
+			<div><?php echo elgg_echo("socialink:settings:hyves:allow_login"); ?></div>
+			<?php echo elgg_view("input/dropdown", array("name" => "params[hyves_allow_login]", "value" => $plugin->hyves_allow_login, "options_values" => $yesno_options)); ?>
+			
+			<div><?php echo elgg_echo("socialink:settings:hyves:allow_create"); ?></div>
+			<?php echo elgg_view("input/dropdown", array("name" => "params[hyves_allow_create]", "value" => $plugin->hyves_allow_create, "options_values" => $yesno_options)); ?>
+			
+			<br /><br />
+			
+			<div><?php echo elgg_echo("socialink:settings:hyves:sync_profile_fields"); ?></div>
+			<?php 
+				if($fields = socialink_get_network_fields("hyves")){
+					?>
+					<table class="elgg-table">
+						<tr>
+							<th><?php echo elgg_echo("socialink:settings:hyves:hyves_field"); ?></th>
+							<th><?php echo elgg_echo("socialink:settings:profile_field"); ?></th>
+						</tr>
+						<?php 
+							foreach($fields as $settings_name => $network_name){
+								$setting = "hyves_profile_" . $settings_name;
+								
+								echo "<tr>\n";
+								echo "<td>" . elgg_echo("socialink:hyves:field:" . $settings_name) . "</td>\n";
+								echo "<td>" . elgg_view("input/dropdown", array("name" => "params[" . $setting . "]", "options_values" => $profile_options, "value" => $plugin->$setting)) . "</td>\n";
+								echo "</tr>\n";
+							}
+						?>
+					</table>
+					<?php 
+				}
+			?>
+		</div>
+	</div>
+	<!-- End hyves settings -->
 	
 </div>
 

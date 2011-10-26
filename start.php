@@ -8,16 +8,19 @@
 	function socialink_init(){
 		// prepare vendor libaries
 		elgg_register_classes(dirname(__FILE__) . "/vendors/oauth/classes");
+		elgg_register_classes(dirname(__FILE__) . "/vendors/GenusApis/lib");
 		
 		// register Social libraries
 		elgg_register_class("Facebook", dirname(__FILE__) . "/vendors/facebook_php_sdk/src/facebook.php");
 		elgg_register_class("LinkedIn", dirname(__FILE__) . "/vendors/simple_linkedin/linkedin_3.1.1.class.php");
 		elgg_register_class("TwitterOAuth", dirname(__FILE__) . "/vendors/twitteroauth/twitterOAuth.php");
+		elgg_register_class("GenusApis", dirname(__FILE__) . "/vendors/GenusApis/GenusApis.php");
 		
 		// register SociaLink libraries
 		elgg_register_library("socialink:facebook", dirname(__FILE__) . "/lib/networks/facebook.php");
 		elgg_register_library("socialink:linkedin", dirname(__FILE__) . "/lib/networks/linkedin.php");
 		elgg_register_library("socialink:twitter", dirname(__FILE__) . "/lib/networks/twitter.php");
+		elgg_register_library("socialink:hyves", dirname(__FILE__) . "/lib/networks/hyves.php");
 		
 		// extend CSS
 		elgg_extend_view("css/elgg", "socialink/css/site");

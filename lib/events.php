@@ -56,6 +56,9 @@
 					case "linkedin":
 						socialink_linkedin_authorize($entity->getGUID());
 						break;
+					case "hyves":
+						socialink_hyves_authorize($entity->getGUID());
+						break;
 				}
 	
 				$SESSION->offsetUnset("socialink_token");

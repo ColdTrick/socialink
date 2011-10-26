@@ -18,6 +18,9 @@
 						case "facebook":
 							socialink_facebook_sync_profile_metadata($user->getGUID());
 							break;
+						case "hyves":
+							socialink_hyves_sync_profile_metadata($user->getGUID());
+							break;
 					}
 				}
 			}

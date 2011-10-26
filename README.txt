@@ -28,6 +28,11 @@ Log in to your Elgg social network using LinkedIn, Twitter and/or Facebook
 === OAuth PHP ===
 - URL: http://code.google.com/p/oauth/
 
+=== GenusApis (for Hyves) ===
+- URL: http://code.google.com/p/genusapis/
+
+Please note that many changes have been made to this API to prevent conflicts with OAuth API
+
 == 3. ToDo ==
 - Post to The Wire
 - Twitter in

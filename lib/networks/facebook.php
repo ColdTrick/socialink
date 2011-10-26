@@ -359,7 +359,6 @@
 	}
 
 	function socialink_facebook_validate_connection($user_guid = 0){
-		global $CONFIG;
 		$result = true;
 		
 		if(empty($user_guid)){

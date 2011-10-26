@@ -15,6 +15,7 @@
 		'socialink:network:twitter' => "Twitter",
 		'socialink:network:linkedin' => "LinkedIn",
 		'socialink:network:facebook' => "Facebook",
+		'socialink:network:hyves' => "Hyves",
 	
 		// profile fields
 		'profile:twitter_name' => "Name",	
@@ -60,6 +61,15 @@
 		'socialink:facebook:field:bio' => "Bio",
 		'socialink:facebook:field:hometown' => "Hometown",
 		
+		'socialink:hyves:field:name' => "Name",
+		'socialink:hyves:field:firstname' => "Firstname",
+		'socialink:hyves:field:lastname' => "Lastname",
+		'socialink:hyves:field:profile_url' => "Profile URL",
+		'socialink:hyves:field:gender' => "Gender",
+		'socialink:hyves:field:city' => "City",
+		'socialink:hyves:field:country' => "Country",
+		'socialink:hyves:field:about' => "About me",
+		
 		// views
 		// admin settings
 		'socialink:settings:in_options:fifteenmin' => "Yes, every fifteen minutes",	
@@ -68,6 +78,7 @@
 		'socialink:settings:enable:twitter' => "Enable Twitter support",
 		'socialink:settings:enable:facebook' => "Enable Facebook support",
 		'socialink:settings:enable:linkedin' => "Enable LinkedIn support",
+		'socialink:settings:enable:hyves' => "Enable Hyves support",
 	
 		'socialink:settings:profile_field' => "Profile field",
 		'socialink:settings:profile_fields:dont_sync' => "Don't sync this field",
@@ -98,6 +109,14 @@
 		'socialink:settings:linkedin:sync_profile_fields' => "Sync LinkedIn fields to profile",
 		'socialink:settings:linkedin:linkedin_field' => "LinkedIn field",
 		
+		'socialink:settings:hyves:header' => "Hyves settings",
+		'socialink:settings:hyves:api:consumer_key' => "API key",
+		'socialink:settings:hyves:api:consumer_secret' => "API secret",
+		'socialink:settings:hyves:allow_login' => "Allow login by Hyves",
+		'socialink:settings:hyves:allow_create' => "Allow account creation by Hyves",
+		'socialink:settings:hyves:sync_profile_fields' => "Sync Hyves fields to profile",
+		'socialink:settings:hyves:hyves_field' => "Hyves field",
+		
 		// user settings
 		'socialink:usersettings:no_access' => "The usersettings for this plugin can only be managed by the owning user, not by an administrator",
 		
@@ -118,25 +137,21 @@
 		'socialink:usersettings:linkedin:not_connected' => "Your account is not yet connected to you LinkedIn account. To link your accounts please click on %sthis link%s.",
 		'socialink:usersettings:linkedin:remove' => "Your account is linked to your LinkedIn account. %sRevoke Access%s",
 		
+		'socialink:usersettings:hyves:not_connected' => "Your account is not yet connected to you Hyves account. To link your accounts please click on %sthis link%s.",
+		'socialink:usersettings:hyves:remove' => "Your account is linked to your Hyves account. %sRevoke Access%s",
+		
 		'socialink:usersettings:twitter:thewire' => "Post your Wire messages to Twitter",
 		'socialink:usersettings:facebook:thewire' => "Post your Wire messages to Facebook",
 		'socialink:usersettings:linkedin:thewire' => "Post your Wire messages to LinkedIn",
+		'socialink:usersettings:hyves:thewire' => "Post your Wire messages to Hyves",
 	
 		// authorize
-		'socialink:authorize:twitter:failed' => "An error occured while authorizing you with your Twitter account",
-		'socialink:authorize:twitter:success' => "Your Twitter account was successfully linked",
-		
-		'socialink:authorize:linkedin:failed' => "An error occured while authorizing you with your LinkedIn account",
-		'socialink:authorize:linkedin:success' => "Your LinkedIn account was successfully linked",
-		
-		'socialink:authorize:facebook:failed' => "An error occured while authorizing you with your Facebook account",
-		'socialink:authorize:facebook:success' => "Your Facebook account was successfully linked",
+		'socialink:authorize:failed' => "An error occured while authorizing you with your %s account",
+		'socialink:authorize:success' => "Your %s account was successfully linked",
 		
 		// login
 		'socialink:login' => "Or login with",
-		'socialink:login:twitter' => "Login with Twitter",
-		'socialink:login:facebook' => "Login with Facebook",
-		'socialink:login:linkedin' => "Login with LinkedIn",
+		'socialink:login:network' => "Login with %s",
 		'socialink:login:error:no_user' => "No user linked to this %s account, or the link has been invalidated. Also account creation is not allowed with %s",	
 	
 		// create user
@@ -154,6 +169,9 @@
 		
 		// facebook
 		'socialink:create_account:facebook:description' => "If you don't have an account you can create one by clicking on the Register button, we will then create an account based on your Facebook name and e-mail address.",
+		
+		// hyves
+		'socialink:create_account:hyves:description' => "If you don't have an account you can create one by providing an e-mail address and clicking the Register button, we will then create an account based on you Hyves firstname and lastname and the provided e-mail address.",
 
 		'socialink:create_account:disclaimer' => "Depending on site settings you need to validate your account.",
 		
@@ -161,6 +179,7 @@
 		'socialink:share:facebook' => "Share on Facebook",
 		'socialink:share:twitter' => "Post on Twitter",
 		'socialink:share:linkedin' => "Share on LinkedIn",
+		'socialink:share:hyves' => "Share on Hyves",
 		'socialink:share:too_long' => "Your message contains too much characters",
 	
 		// link account
@@ -170,29 +189,15 @@
 		// remove
 		'socialink:actions:remove:error:unknown_service' => "You've selected an unknow service to remove",
 		
-		'socialink:actions:remove:twitter:error:unavailable' => "The Twitter service is not available",
-		'socialink:actions:remove:twitter:error:connected' => "Your account is not connected to Twitter",
-		'socialink:actions:remove:twitter:error:remove' => "An unknown error occured while removing the link, please try again",
-		'socialink:actions:remove:twitter:success' => "The link with Twitter was successfully removed",
-		
-		'socialink:actions:remove:linkedin:error:unavailable' => "The LinkedIn service is not available",
-		'socialink:actions:remove:linkedin:error:connected' => "Your account is not connected to LinkedIn",
-		'socialink:actions:remove:linkedin:error:remove' => "An unknown error occured while removing the link, please try again",
-		'socialink:actions:remove:linkedin:success' => "The link with LinkedIn was successfully removed",
-		
-		'socialink:actions:remove:facebook:error:unavailable' => "The Facebook service is not available",
-		'socialink:actions:remove:facebook:error:connected' => "Your account is not connected to Facebook",
-		'socialink:actions:remove:facebook:error:remove' => "An unknown error occured while removing the link, please try again",
-		'socialink:actions:remove:facebook:success' => "The link with Facebook was successfully removed",
+		'socialink:actions:remove:error:unavailable' => "The %s service is not available",
+		'socialink:actions:remove:error:connected' => "Your account is not connected to %s",
+		'socialink:actions:remove:error:remove' => "An unknown error occured while removing the link with %s, please try again",
+		'socialink:actions:remove:success' => "The link with %s was successfully removed",
 		
 		// create user
 		'socialink:actions:create_user:error:loggedin' => "This action is only for logged out users",
 		'socialink:actions:create_user:error:network' => "The supplied network is not supported",
-		'' => "",
-		'' => "",
-	
+		
 	);
 	
 	add_translation("en", $english);
-
-?>

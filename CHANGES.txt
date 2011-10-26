@@ -1,4 +1,10 @@
 = Version history =
+x.x:
+
+- added: support for hyves social network (http://www.hyves.nl)
+- changed: made some code more effecient
+- changed: language keys to be more generic
+
 1.0 beta 1 (2011-10-25):
 
 - changed: Facebook PHP SDK to version 3.1.1 (was 2.1.2)

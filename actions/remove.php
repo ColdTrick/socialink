@@ -4,56 +4,24 @@
 	
 	$service = get_input("service");
 	
-	switch($service){
-		case "twitter":
-			if(socialink_twitter_available()){
-				if(socialink_twitter_is_connected()){
-					if(socialink_twitter_remove_connection()){
-						system_message(elgg_echo("socialink:actions:remove:twitter:success"));
-					} else {
-						register_error(elgg_echo("socialink:actions:remove:twitter:error:remove"));
-					}
+	if(socialink_is_supported_network($service)){
+		$network_string = elgg_echo("socialink:network:" . $service);
+		
+		if(socialink_is_available_network($service)){
+			if(call_user_func("socialink_" . $service . "_is_connected")){
+				if(call_user_func("socialink_" . $service . "_remove_connection")){
+					system_message(elgg_echo("socialink:actions:remove:success", array($network_string)));
 				} else {
-					register_error(elgg_echo("socialink:actions:remove:twitter:error:connected"));
+					register_error(elgg_echo("socialink:actions:remove:error:remove", array($network_string)));
 				}
 			} else {
-				register_error(elgg_echo("socialink:actions:remove:twitter:error:unavailable"));
+				register_error(elgg_echo("socialink:actions:remove:error:connected", array($network_string)));
 			}
-			break;
-		case "linkedin":
-			if(socialink_linkedin_available()){
-				if(socialink_linkedin_is_connected()){
-					if(socialink_linkedin_remove_connection()){
-						system_message(elgg_echo("socialink:actions:remove:linkedin:success"));
-					} else {
-						register_error(elgg_echo("socialink:actions:remove:linkedin:error:remove"));
-					}
-				} else {
-					register_error(elgg_echo("socialink:actions:remove:linkedin:error:connected"));
-				}
-			} else {
-				register_error(elgg_echo("socialink:actions:remove:linkedin:error:unavailable"));
-			}
-			break;
-		case "facebook":
-			if(socialink_facebook_available()){
-				if(socialink_facebook_is_connected()){
-					if(socialink_facebook_remove_connection()){
-						system_message(elgg_echo("socialink:actions:remove:facebook:success"));
-					} else {
-						register_error(elgg_echo("socialink:actions:remove:facebook:error:remove"));
-					}
-				} else {
-					register_error(elgg_echo("socialink:actions:remove:facebook:error:connected"));
-				}
-			} else {
-				register_error(elgg_echo("socialink:actions:remove:facebook:error:unavailable"));
-			}
-			break;
-		default:
-			register_error(elgg_echo("socialink:actions:remove:error:unknown_service"));
-			break;
+		} else {
+			register_error(elgg_echo("socialink:actions:remove:error:unavailable", array($network_string)));
+		}
+	} else {
+		register_error(elgg_echo("socialink:actions:remove:error:unknown_service"));
 	}
-
-
+	
 	forward(REFERER);
