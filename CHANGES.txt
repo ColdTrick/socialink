@@ -1,5 +1,5 @@
 = Version history =
-x.x:
+1.0 beta 2 (2011-10-26):
 
 - added: support for hyves social network (http://www.hyves.nl)
 - changed: made some code more effecient
