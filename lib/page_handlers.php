@@ -116,9 +116,10 @@
 							}
 							break;
 						case "hyves":
+							
 							$token = socialink_hyves_get_access_token(get_input("oauth_verifier"));
 							
-							if($token->getKey() && $token->getSecret()){
+							if(is_object($token) && $token->getKey() && $token->getSecret()){
 								$params = array(
 									"type" => "user",
 									"limit" => 1,
@@ -139,6 +140,7 @@
 							} else {
 								register_error($error_msg_no_user);
 							}
+							
 							break;
 					}
 					
@@ -193,7 +195,6 @@
 			case "share":
 				if(elgg_is_logged_in()){
 					include(dirname(dirname(__FILE__)) . "/pages/share.php");
-					exit();
 				}
 				break;
 			case "forward":
@@ -227,6 +228,4 @@
 				}
 				break;
 		}
-	
-		forward();
 	}

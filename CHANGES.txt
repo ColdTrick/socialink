@@ -1,4 +1,8 @@
 = Version history =
+x.x:
+
+- fixed: error in page_handler
+
 1.0 beta 2 (2011-10-26):
 
 - added: support for hyves social network (http://www.hyves.nl)
