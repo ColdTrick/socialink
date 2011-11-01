@@ -1,7 +1,9 @@
 = Version history =
 x.x:
 
-- fixed: error in page_handler
+- added: login will return to referer
+- fixed: problems with Hyves login
+- fixed: forwarding error on non linked accounts
 
 1.0 beta 2 (2011-10-26):
 

@@ -264,3 +264,12 @@
 		return $result;
 	}
 	
+	function socialink_prepare_login(){
+		$site_url = elgg_get_site_url();
+		$referer = $_SERVER["HTTP_REFERER"];
+		
+		if(($site_url != $referer) && stristr($referer, $site_url)){
+			$_SESSION["last_forward_from"] = $referer;
+		}
+	}
+	

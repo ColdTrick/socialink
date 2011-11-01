@@ -71,6 +71,7 @@
 			if(isset($SESSION["socialink_facebook"]) && isset($SESSION["socialink_facebook"]["state"])){
 				$session_state = $SESSION["socialink_facebook"]["state"];
 				$session_callback = $SESSION["socialink_facebook"]["callback"];
+				
 				if($state == $session_state){
 					$SESSION->offsetUnset('socialink_facebook');
 					// fetch an access token
@@ -83,16 +84,22 @@
 							"code" => get_input("code")
 						);
 						
-						
 						$base_url = Facebook::$DOMAIN_MAP["graph"];
 						
 						$url_post_fix = http_build_query($params, null, "&");
 						// session callback not in params as it is already html encoded
 						$url = $base_url . $url . "?redirect_uri=" . $session_callback . "&" . $url_post_fix;
 						
-						if($response = file_get_contents($url)){
+						$ch = curl_init($url);
+						curl_setopt($ch, CURLOPT_HEADER, false);
+						curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+						
+						$response = curl_exec($ch);
+						curl_close($ch);
+						
+						if(!empty($response)){
+							list($dummy, $token) = explode("=", $response);
 							
-							list($dummy,$token) = explode("=", $response);
 							if(!empty($token)){
 								$result = $token;
 							}

@@ -60,7 +60,7 @@
 					
 					$result = $api->getAuthorizeUrl($token, $callback);
 				} catch(Exception $e){
-					var_dump($e);
+					register_error($e->getMessage());
 				}
 			}
 		}
@@ -79,10 +79,12 @@
 				$token = unserialize($SESSION['socialink_hyves']);
 				$SESSION->offsetUnset('socialink_hyves');
 				
-				// fetch an access token
-				if($api = socialink_hyves_get_api_object($keys)){
-					$result = $api->retrieveAccesstoken($token);
-				}
+				try {
+					// fetch an access token
+					if($api = socialink_hyves_get_api_object($keys)){
+						$result = $api->retrieveAccesstoken($token);
+					}
+				} catch (Exception $e){}
 			} elseif(isset($SESSION["socialink_token"])){
 				$result = unserialize($SESSION["socialink_token"]);
 			}

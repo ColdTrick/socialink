@@ -52,6 +52,7 @@
 			if($api = socialink_twitter_get_api_object($keys)){
 				try {
 					$token = $api->getRequestToken($callback);
+					
 					// save token in session for use after authorization
 					$SESSION['socialink_twitter'] = array(
 						'oauth_token' => $token['oauth_token'],
@@ -60,7 +61,7 @@
 				
 					$result = $api->getAuthorizeURL($token['oauth_token']);
 				} catch(Exception $e){
-					var_dump($e);
+					register_error($e->getMessage());
 				}
 			}
 		}

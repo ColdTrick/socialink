@@ -205,6 +205,10 @@
 					$allowed_actions = array("login", "authorize");
 					
 					if(socialink_is_available_network($network) && in_array($action, $allowed_actions)){
+						if($action = "login"){
+							socialink_prepare_login();
+						}
+						
 						$callback_url = elgg_get_site_url() . "socialink/" . $action . "/" . $network;
 	
 						$forward_url = "";
