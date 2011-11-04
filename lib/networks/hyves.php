@@ -50,7 +50,8 @@
 			if($api = socialink_hyves_get_api_object($keys)){
 				try {
 					$methods = array(
-						"users.get"
+						"users.get",
+						"wwws.create"
 					);
 					
 					$token = $api->retrieveRequesttoken($methods, "infinite");
