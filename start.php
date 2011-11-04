@@ -45,7 +45,7 @@
 			switch($setting){
 				case "fifteenmin":
 				case "halfhour":
-					elgg_register_plugin_hook("cron", $setting, "socialink_twitter_in_cron_hook");
+					elgg_register_plugin_hook_handler("cron", $setting, "socialink_twitter_in_cron_hook");
 					break;
 			}
 		}
