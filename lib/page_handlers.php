@@ -147,6 +147,7 @@
 					if($user instanceof ElggUser){
 						
 						try {
+							
 							// permanent login
 							login($user, true);
 							
@@ -169,7 +170,8 @@
 								forward();
 							}
 						} catch (LoginException $e) {
-							register_error($e->getMessage());
+							// validation mechanisme should report that you are not authenticated. Currently uservalidation by email doesn't do that
+							//register_error($e->getMessage());
 							forward();
 						}
 					}
@@ -190,6 +192,8 @@
 							
 							break;
 					}
+				} else {
+					forward();
 				}
 				break;
 			case "share":
@@ -205,7 +209,7 @@
 					$allowed_actions = array("login", "authorize");
 					
 					if(socialink_is_available_network($network) && in_array($action, $allowed_actions)){
-						if($action = "login"){
+						if($action == "login"){
 							socialink_prepare_login();
 						}
 						

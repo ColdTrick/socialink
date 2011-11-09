@@ -50,9 +50,7 @@
 						unset($_SESSION["last_forward_from"]);
 					}
 				}
-			} catch (Exception $e){
-				register_error($e->getMessage());
-			}
+			} catch (Exception $e) {}
 		} else {
 			register_error(elgg_echo("registerbad"));
 		}

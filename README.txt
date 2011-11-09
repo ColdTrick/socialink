@@ -38,3 +38,4 @@ Please note that many changes have been made to this API to prevent conflicts wi
 - Twitter in
 - If The Wire to network, prevent twitter deadloops
 - Share content on social networks
+- check walled garden in no linked account

@@ -1,5 +1,6 @@
 <?php 
 
+	// @todo: how is this done in Elgg 1.8
 	define("externalpage", true);
 	
 	if(!elgg_is_logged_in() && !empty($_SESSION["socialink_token"])){

@@ -2,6 +2,7 @@
 x.x:
 
 - added: login will return to referer
+- fixed: create account system message problem
 - fixed: problems with Hyves login
 - fixed: forwarding error on non linked accounts
 
