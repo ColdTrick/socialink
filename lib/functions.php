@@ -95,23 +95,23 @@
 	}
 	
 	function socialink_get_available_networks(){
-		$result = false;
+		static $available;
 		
-		if($networks = socialink_get_supported_networks()){
-			$available = array();
-			
-			foreach($networks as $network){
-				if(call_user_func("socialink_" . $network . "_available")){
-					$available[] = $network;
+		if(!isset($available)){
+			if($networks = socialink_get_supported_networks()){
+				$available = array();
+				
+				foreach($networks as $network){
+					if(call_user_func("socialink_" . $network . "_available")){
+						$available[] = $network;
+					}
 				}
-			}
-			
-			if(!empty($available)){
-				$result = $available;
+			} else {
+				$available = false;
 			}
 		}
 		
-		return $result;
+		return $available;
 	}
 	
 	function socialink_is_available_network($network){
