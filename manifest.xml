@@ -45,6 +45,7 @@ Features
 Version history:
 =====================
 x.x:
+	- fixed: performance of socialink_get_available_networks()
 	- changed: Facebook PHP SDK to version 3.1.1 (was 2.1.2)
 
 0.5.1 (2011-08-05):
