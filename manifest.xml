@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin_manifest>
 	<field key="author" value="ColdTrick IT Solutions" />
-	<field key="version" value="0.5.1" />
+	<field key="version" value="0.5.2" />
 	<field key="description" value="SociaLink connect with other social networks" />
 	<field key="website" value="http://www.coldtrick.com/" />
 	<field key="copyright" value="(C) ColdTrick IT Solutions 2011" />
@@ -44,7 +44,7 @@ Features
 =====================
 Version history:
 =====================
-x.x:
+0.5.2 (2011-11-29):
 	- fixed: performance of socialink_get_available_networks()
 	- changed: Facebook PHP SDK to version 3.1.1 (was 2.1.2)
 
