@@ -7,7 +7,7 @@
 		"no" => elgg_echo("option:no"),
 		"yes" => elgg_echo("option:yes")
 	);
-	socialink_linkedin_sync_profile_metadata();
+	
 	echo "<div>";
 	echo "<div class='socialink_usersettings_network_icon' id='socialink_usersettings_linkedin_icon'></div>";
 	echo "<div class='socialink_usersettings_network_config'>";
