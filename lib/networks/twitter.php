@@ -147,7 +147,7 @@
 			$user_guid = get_loggedin_userid();
 		}
 		
-		if(!empty($user_guid) && socialink_twitter_is_connected()){
+		if(!empty($user_guid) && socialink_twitter_is_connected($user_guid)){
 			set_plugin_usersetting("twitter_oauth_token", null, $user_guid, "socialink");
 			set_plugin_usersetting("twitter_oauth_secret", null, $user_guid, "socialink");
 			set_plugin_usersetting("twitter_screen_name", null, $user_guid, "socialink");
