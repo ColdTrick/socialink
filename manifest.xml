@@ -45,6 +45,7 @@ Features
 Version history:
 =====================
 x.x:
+	- added: support for OpenBibID
 	- fixed: LinkedIn debug code in usersettings view
 	- fixed: small error in removing Twitter connection
 

@@ -70,6 +70,13 @@
 							register_error(elgg_echo("socialink:authorize:facebook:failed"));
 						}
 						break;
+					case "openbibid":
+						if(socialink_openbibid_authorize()){
+							system_message(elgg_echo("socialink:authorize:openbibid:success"));
+						} else {
+							register_error(elgg_echo("socialink:authorize:openbibid:failed"));
+						}
+						break;
 				}
 				
 				if(!empty($page[1]) && socialink_is_available_network($page[1])){
@@ -145,6 +152,26 @@
 								register_error($error_msg_no_user);
 							}
 							break;
+						case "openbibid":
+							$token = socialink_openbibid_get_access_token(get_input('oauth_verifier'));
+								
+							if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
+								$values = array(
+									'plugin:settings:socialink:openbibid_user_id' => $token['userId']
+								);
+								
+								if ($users = get_entities_from_private_setting_multi($values, 'user', '', 0, '', 1, 0, false, -1)) {
+									$user = $users[0];
+									
+									socialink_openbibid_update_connection($token, $user->getGUID());
+								} else {
+									$_SESSION["socialink_token"] = $token;
+									forward("pg/socialink/no_linked_account/openbibid");
+								}
+							} else {
+								register_error($error_msg_no_user);
+							}
+							break;
 					}
 					
 					if($user instanceof ElggUser){
@@ -202,6 +229,7 @@
 						case "linkedin":
 						case "facebook":
 						case "twitter":
+						case "openbibid":
 							set_input("network", $page[1]);
 							include(dirname(__FILE__) . "/pages/no_linked_account.php");
 							break;
@@ -234,6 +262,9 @@
 								break;
 							case "twitter":
 								$forward_url = socialink_twitter_get_authorize_url($callback_url);
+								break;
+							case "openbibid":
+								$forward_url = socialink_openbibid_get_authorize_url($callback_url);
 								break;
 						}
 						
@@ -328,6 +359,9 @@
 					case "linkedin":
 						socialink_linkedin_authorize($entity->getGUID());
 						break;
+					case "openbibid":
+						socialink_openbibid_authorize($entity->getGUID());
+						break;
 				}
 				
 				$SESSION->offsetUnset("socialink_token");
@@ -365,4 +399,4 @@
 	register_action("socialink/remove", false, dirname(__FILE__) . "/actions/remove.php");
 	register_action("socialink/create_user", true, dirname(__FILE__) . "/actions/create_user.php");
 	register_action("socialink/share", false, dirname(__FILE__) . "/actions/share.php");
-?>
+	

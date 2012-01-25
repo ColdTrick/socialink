@@ -44,6 +44,13 @@
 
 }
 
+#socialink_usersettings_openbibid_icon {
+	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/openbibid/logo_85x84.jpg") transparent top left no-repeat;
+	width: 85px;
+	height: 84px;
+
+}
+
 #socialink_login a{
 	margin-left: 5px;
 	vertical-align: middle;

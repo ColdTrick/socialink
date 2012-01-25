@@ -64,9 +64,27 @@
 		
 		return $result;
 	}
+	
+	function socialink_openbibid_available(){
+		$result = false;
+		
+		if(get_plugin_setting("enable_openbibid", "socialink") == "yes"){
+			$consumer_key = get_plugin_setting("openbibid_consumer_key", "socialink");
+			$consumer_secret = get_plugin_setting("openbibid_consumer_secret", "socialink");
+			
+			if(!empty($consumer_key) && !empty($consumer_secret)){
+				$result = array(
+					"consumer_key" => $consumer_key,
+					"consumer_secret" => $consumer_secret,
+				);
+			}
+		}
+		
+		return $result;
+	}
 
 	function socialink_get_supported_networks(){
-		return array("twitter", "linkedin", "facebook");
+		return array("twitter", "linkedin", "facebook", "openbibid");
 	}
 	
 	function socialink_is_supported_network($network){

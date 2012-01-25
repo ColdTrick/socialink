@@ -50,6 +50,21 @@
 				register_error(elgg_echo("socialink:actions:remove:facebook:error:unavailable"));
 			}
 			break;
+		case "openbibid":
+			if(socialink_openbibid_available()){
+				if(socialink_openbibid_is_connected()){
+					if(socialink_openbibid_remove_connection()){
+						system_message(elgg_echo("socialink:actions:remove:openbibid:success"));
+					} else {
+						register_error(elgg_echo("socialink:actions:remove:openbibid:error:remove"));
+					}
+				} else {
+					register_error(elgg_echo("socialink:actions:remove:openbibid:error:connected"));
+				}
+			} else {
+				register_error(elgg_echo("socialink:actions:remove:openbibid:error:unavailable"));
+			}
+			break;
 		default:
 			register_error(elgg_echo("socialink:actions:remove:error:unknown_service"));
 			break;

@@ -15,6 +15,7 @@
 		'socialink:network:twitter' => "Twitter",
 		'socialink:network:linkedin' => "LinkedIn",
 		'socialink:network:facebook' => "Facebook",
+		'socialink:network:openbibid' => "OpenBibID",
 	
 		// profile fields
 		'profile:twitter_name' => "Name",	
@@ -65,9 +66,11 @@
 		'socialink:settings:in_options:fifteenmin' => "Yes, every fifteen minutes",	
 		'socialink:settings:in_options:halfhour' => "Yes, every half hour",	
 		
+		'socialink:settings:general:header' => "General settings",
 		'socialink:settings:enable:twitter' => "Enable Twitter support",
 		'socialink:settings:enable:facebook' => "Enable Facebook support",
 		'socialink:settings:enable:linkedin' => "Enable LinkedIn support",
+		'socialink:settings:enable:openbibid' => "Enable OpenBibID support",
 	
 		'socialink:settings:profile_field' => "Profile field",
 		'socialink:settings:profile_fields:dont_sync' => "Don't sync this field",
@@ -98,6 +101,14 @@
 		'socialink:settings:linkedin:sync_profile_fields' => "Sync LinkedIn fields to profile",
 		'socialink:settings:linkedin:linkedin_field' => "LinkedIn field",
 		
+		'socialink:settings:openbibid:header' => "OpenBibID settings",
+		'socialink:settings:openbibid:api:consumer_key' => "API key",
+		'socialink:settings:openbibid:api:consumer_secret' => "API secret",
+		'socialink:settings:openbibid:allow_login' => "Allow login by OpenBibID",
+		'socialink:settings:openbibid:allow_create' => "Allow account creation by OpenBibID",
+		'socialink:settings:openbibid:sync_profile_fields' => "Sync OpenBibID fields to profile",
+		'socialink:settings:openbibid:linkedin_field' => "OpenBibID field",
+		
 		// user settings
 		'socialink:usersettings:no_access' => "The usersettings for this plugin can only be managed by the owning user, not by an administrator",
 		
@@ -118,6 +129,9 @@
 		'socialink:usersettings:linkedin:not_connected' => "Your account is not yet connected to you LinkedIn account. To link your accounts please click on %sthis link%s.",
 		'socialink:usersettings:linkedin:remove' => "Your account is linked to your LinkedIn account. %sRevoke Access%s",
 		
+		'socialink:usersettings:openbibid:not_connected' => "Your account is not yet connected to you OpenBibId account. To link your accounts please click on %sthis link%s.",
+		'socialink:usersettings:openbibid:remove' => "Your account is linked to your OpenBibId account. %sRevoke Access%s",
+		
 		'socialink:usersettings:twitter:thewire' => "Post your Wire messages to Twitter",
 		'socialink:usersettings:facebook:thewire' => "Post your Wire messages to Facebook",
 		'socialink:usersettings:linkedin:thewire' => "Post your Wire messages to LinkedIn",
@@ -132,11 +146,15 @@
 		'socialink:authorize:facebook:failed' => "An error occured while authorizing you with your Facebook account",
 		'socialink:authorize:facebook:success' => "Your Facebook account was successfully linked",
 		
+		'socialink:authorize:openbibid:failed' => "An error occured while authorizing you with your OpenBibID account",
+		'socialink:authorize:openbibid:success' => "Your OpenBibID account was successfully linked",
+		
 		// login
 		'socialink:login' => "Or login with",
 		'socialink:login:twitter' => "Login with Twitter",
 		'socialink:login:facebook' => "Login with Facebook",
 		'socialink:login:linkedin' => "Login with LinkedIn",
+		'socialink:login:openbibid' => "Login with OpenBibID",
 		'socialink:login:error:no_user' => "No user linked to this %s account, or the link has been invalidated. Also account creation is not allowed with %s",	
 	
 		// create user
@@ -185,14 +203,17 @@
 		'socialink:actions:remove:facebook:error:remove' => "An unknown error occured while removing the link, please try again",
 		'socialink:actions:remove:facebook:success' => "The link with Facebook was successfully removed",
 		
+		'socialink:actions:remove:openbibid:error:unavailable' => "The OpenBibID service is not available",
+		'socialink:actions:remove:openbibid:error:connected' => "Your account is not connected to OpenBibID",
+		'socialink:actions:remove:openbibid:error:remove' => "An unknown error occured while removing the link, please try again",
+		'socialink:actions:remove:openbibid:success' => "The link with OpenBibID was successfully removed",
+		
 		// create user
 		'socialink:actions:create_user:error:loggedin' => "This action is only for logged out users",
 		'socialink:actions:create_user:error:network' => "The supplied network is not supported",
-		'' => "",
+		
 		'' => "",
 	
 	);
 	
 	add_translation("en", $english);
-
-?>

@@ -22,9 +22,15 @@
 		if(socialink_linkedin_available()){
 			echo elgg_view("usersettings/socialink/linkedin", $vars);
 		}
+		
+		// is OpenBibId available for users
+		if(socialink_openbibid_available()){
+			
+			echo elgg_view("usersettings/socialink/openbibid", $vars);
+		}
+		
 		echo "</div>";
 	} else {
 		echo elgg_echo("socialink:usersettings:no_access");
 	}
-
-?>
+	

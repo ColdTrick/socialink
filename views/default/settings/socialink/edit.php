@@ -42,6 +42,8 @@
 </script>
 
 <div>
+	<h3 class="settings"><?php echo elgg_echo("socialink:settings:general:header"); ?></h3>
+	
 	<table>
 		<tr>
 			<td><?php echo elgg_echo("socialink:settings:enable:twitter"); ?>&nbsp;</td>
@@ -54,6 +56,10 @@
 		<tr>
 			<td><?php echo elgg_echo("socialink:settings:enable:linkedin"); ?>&nbsp;</td>
 			<td><?php echo elgg_view("input/pulldown", array("internalname" => "params[enable_linkedin]", "value" => $plugin->enable_linkedin, "options_values" => $yesno_options, "js" => "onchange='socialink_settings_show_section(\"linkedin\", this);'")); ?></td>
+		</tr>
+		<tr>
+			<td><?php echo elgg_echo("socialink:settings:enable:openbibid"); ?>&nbsp;</td>
+			<td><?php echo elgg_view("input/pulldown", array("internalname" => "params[enable_openbibid]", "value" => $plugin->enable_openbibid, "options_values" => $yesno_options, "js" => "onchange='socialink_settings_show_section(\"openbibid\", this);'")); ?></td>
 		</tr>
 	</table>
 </div>
@@ -215,5 +221,55 @@
 		</div>
 	</div>
 	<!-- End LinkedIn settings -->
+	
+	<!-- OpenBibId settings -->
+	<div id="socialink_settings_openbibid" <?php if($plugin->enable_openbibid == "yes") echo "class='socialink_settings_show'"; ?>>
+		<h3 class="settings"><?php echo elgg_echo("socialink:settings:openbibid:header"); ?></h3>
+		
+		<div>
+			<div><?php echo elgg_echo("socialink:settings:openbibid:api:consumer_key"); ?></div>
+			<?php echo elgg_view("input/text", array("internalname" => "params[openbibid_consumer_key]", "value" => $plugin->openbibid_consumer_key)); ?>
+			
+			<div><?php echo elgg_echo("socialink:settings:openbibid:api:consumer_secret"); ?></div>
+			<?php echo elgg_view("input/text", array("internalname" => "params[openbibid_consumer_secret]", "value" => $plugin->openbibid_consumer_secret)); ?>
+			
+			<br /><br />
+			
+			<div><?php echo elgg_echo("socialink:settings:openbibid:allow_login"); ?></div>
+			<?php echo elgg_view("input/pulldown", array("internalname" => "params[openbibid_allow_login]", "value" => $plugin->openbibid_allow_login, "options_values" => $yesno_options)); ?>
+			
+			<?php /* ?>
+			<div><?php echo elgg_echo("socialink:settings:openbibid:allow_create"); ?></div>
+			<?php echo elgg_view("input/pulldown", array("internalname" => "params[openbibid_allow_create]", "value" => $plugin->openbibid_allow_create, "options_values" => $yesno_options)); ?>
+			
+			<br /><br />
+			
+			<div><?php echo elgg_echo("socialink:settings:openbibid:sync_profile_fields"); ?></div>
+			<?php 
+				if($fields = socialink_get_network_fields("openbibid")){
+					?>
+					<table>
+						<tr>
+							<th><?php echo elgg_echo("socialink:settings:openbibid:openbibid_field"); ?></th>
+							<th><?php echo elgg_echo("socialink:settings:profile_field"); ?></th>
+						</tr>
+						<?php 
+							foreach($fields as $settings_name => $network_name){
+								$setting = "openbibid_profile_" . $settings_name;
+								
+								echo "<tr>\n";
+								echo "<td>" . elgg_echo("socialink:openbibid:field:" . $settings_name) . "</td>\n";
+								echo "<td>" . elgg_view("input/pulldown", array("internalname" => "params[" . $setting . "]", "options_values" => $profile_options, "value" => $plugin->$setting)) . "</td>\n";
+								echo "</tr>\n";
+							}
+						?>
+					</table>
+					<?php 
+				}
+			?>
+			<?php */ ?>
+		</div>
+	</div>
+	<!-- End OpenBibId settings -->
 	
 </div>
