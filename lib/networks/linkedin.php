@@ -1,7 +1,7 @@
 <?php 
 
-	if(!class_exists("LinkedIn")){
-		require_once(dirname(dirname(dirname(__FILE__))) . "/vendors/simple_linkedin/linkedin_3.0.1.class.php");
+	if(!class_exists("LinkedInProxy")){
+		require_once(dirname(dirname(dirname(__FILE__))) . "/vendors/simple_linkedin/linkedin_proxy.php");
 	}
 	
 	function socialink_linkedin_get_api_object($keys){
@@ -14,7 +14,7 @@
 			);
 			
 			try {
-				$api = new LinkedIn($api_config);
+				$api = new LinkedInProxy($api_config);
 				
 				if(isset($keys["oauth_token"]) && isset($keys["oauth_secret"])){
 					$tokens = array(
@@ -27,6 +27,11 @@
 				
 				// set response format to JSON 
 				$api->setResponseFormat(LinkedIn::_RESPONSE_JSON);
+				
+				// set proxy settings
+				if($proxy_settings = socialink_get_proxy_settings()){
+					$api->setProxySettings($proxy_settings);
+				}
 				
 				$result = $api;
 			} catch(Exception $e){}

@@ -20,6 +20,10 @@
 			}
 				
 			$result = new openBibId($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
+			
+			if($proxy_settings = socialink_get_proxy_settings()){
+				$result->setProxySettings($proxy_settings);
+			}
 		}
 	
 		return $result;

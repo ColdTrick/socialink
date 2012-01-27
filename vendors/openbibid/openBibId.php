@@ -31,6 +31,8 @@
 		/* Set the useragnet. */
 		public $useragent = "OpenBibId 0.1";
 		
+		private $proxy = false;
+		
 		function __construct($consumer_key, $consumer_secret, $oauth_token = NULL, $oauth_token_secret = NULL){
 			$this->sha1_method = new OAuthSignatureMethod_HMAC_SHA1();
 			$this->consumer = new OAuthConsumer($consumer_key, $consumer_secret);
@@ -166,6 +168,17 @@
 			}
 		}
 		
+		function setProxySettings($settings){
+			$result = false;
+			
+			if(!empty($settings) && is_array($settings)){
+				$this->proxy = $settings;
+				$result = true;
+			}
+			
+			return $result;
+		}
+		
 		/**
 		 * Make a HTTP request
 		 * 
@@ -190,6 +203,17 @@
 			curl_setopt($ci, CURLOPT_SSL_VERIFYPEER, $this->ssl_verifypeer);
 			curl_setopt($ci, CURLOPT_HEADERFUNCTION, array($this, 'getHeader'));
 			curl_setopt($ci, CURLOPT_HEADER, FALSE);
+			
+			// check if we need to set proxy settings
+			if($this->proxy){
+				if(isset($this->proxy["host"])){
+					curl_setopt($ci, CURLOPT_PROXY, $this->proxy["host"]);
+				}
+				
+				if(isset($this->proxy["port"])){
+					curl_setopt($ci, CURLOPT_PROXYPORT, $this->proxy["port"]);
+				}
+			}
 			
 			switch ($method) {
 				case 'POST':

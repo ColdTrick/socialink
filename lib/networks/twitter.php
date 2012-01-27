@@ -1,7 +1,7 @@
 <?php 
 
-	if(!class_exists("TwitterOAuth")){
-		require_once(dirname(dirname(dirname(__FILE__))) . "/vendors/twitteroauth/twitterOAuth.php");
+	if(!class_exists("TwitterProxy")){
+		require_once(dirname(dirname(dirname(__FILE__))) . "/vendors/twitteroauth/twitter_proxy.php");
 	}
 	
 	function socialink_twitter_get_api_object($keys){
@@ -19,7 +19,11 @@
 				$oauth_secret = null;
 			}
 			
-			$result = new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
+			$result = new TwitterProxy($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
+			
+			if($proxy_settings = socialink_get_proxy_settings()){
+				$result->setProxySettings($proxy_settings);
+			}
 		}
 		
 		return $result;

@@ -1,7 +1,7 @@
 <?php 
 
-	if(!class_exists("Facebook")){
-		require_once(dirname(dirname(dirname(__FILE__))) . "/vendors/facebook_php_sdk/src/facebook.php");
+	if(!class_exists("FacebookProxy")){
+		require_once(dirname(dirname(dirname(__FILE__))) . "/vendors/facebook_php_sdk/facebook_proxy.php");
 	}
 	
 	define("FACEBOOK_OAUTH_BASE_URL", "https://www.facebook.com/dialog/oauth?client_id=");
@@ -15,7 +15,11 @@
 				"secret" => $keys["app_secret"]
 			);
 			
-			$result = new Facebook($config);
+			$result = new FacebookProxy($config);
+			
+			if($proxy_settings = socialink_get_proxy_settings()){
+				$result->setProxySettings($proxy_settings);
+			}
 		}
 		
 		return $result;

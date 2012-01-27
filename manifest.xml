@@ -47,6 +47,7 @@ Version history:
 x.x:
 	- added: support for OpenBibID
 	- added: proxy settings
+	- added: proxy support to Facebook, LinkedIn and Twitter
 	- fixed: LinkedIn debug code in usersettings view
 	- fixed: small error in removing Twitter connection
 
