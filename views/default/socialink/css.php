@@ -3,25 +3,29 @@
 ?>
 #socialink_settings_twitter,
 #socialink_settings_facebook,
-#socialink_settings_linkedin {
+#socialink_settings_linkedin, 
+#socialink_settings_openbibid {
 	display: none;
 }
 
 #socialink_settings_twitter.socialink_settings_show,
 #socialink_settings_facebook.socialink_settings_show,
-#socialink_settings_linkedin.socialink_settings_show {
+#socialink_settings_linkedin.socialink_settings_show,
+#socialink_settings_openbibid.socialink_settings_show {
 	display: block;
 }
 
 #socialink_settings_twitter table,
 #socialink_settings_facebook table,
-#socialink_settings_linkedin table {
+#socialink_settings_linkedin table,
+#socialink_settings_openbibid table {
 	width: 100%;
 }
 
 #socialink_settings_twitter table th,
 #socialink_settings_facebook table th,
-#socialink_settings_linkedin table th {
+#socialink_settings_linkedin table th,
+#socialink_settings_openbibid table th {
 	text-align: left;
 }
 
@@ -75,26 +79,30 @@
 
 #socialink_twitter_sync_configure,
 #socialink_facebook_sync_configure,
-#socialink_linkedin_sync_configure {
+#socialink_linkedin_sync_configure,
+#socialink_openbibid_sync_configure {
 	display: none;
 }
 
 #socialink_twitter_sync_configure.socialink_network_sync_allow,
 #socialink_facebook_sync_configure.socialink_network_sync_allow,
-#socialink_linkedin_sync_configure.socialink_network_sync_allow {
+#socialink_linkedin_sync_configure.socialink_network_sync_allow,
+#socialink_openbibid_sync_configure.socialink_network_sync_allow {
 	display: inline-block;
 }
 
 #socialink_twitter_sync_fields,
 #socialink_facebook_sync_fields,
-#socialink_linkedin_sync_fields {
+#socialink_linkedin_sync_fields,
+#socialink_openbibid_sync_fields {
 	display: none;
 	width: 100%;
 }
 
 #socialink_twitter_sync_fields th,
 #socialink_facebook_sync_fields th,
-#socialink_linkedin_sync_fields th {
+#socialink_linkedin_sync_fields th,
+#socialink_openbibid_sync_fields th {
 	text-align: left;
 }
 
