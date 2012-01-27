@@ -71,6 +71,9 @@
 		'socialink:settings:enable:facebook' => "Enable Facebook support",
 		'socialink:settings:enable:linkedin' => "Enable LinkedIn support",
 		'socialink:settings:enable:openbibid' => "Enable OpenBibID support",
+		
+		 'socialink:settings:proxy:host' => "Proxy host",
+		 'socialink:settings:proxy:port' => "Proxy port",
 	
 		'socialink:settings:profile_field' => "Profile field",
 		'socialink:settings:profile_fields:dont_sync' => "Don't sync this field",

@@ -1,10 +1,24 @@
 <?php 
+	global $SOCIALINK_PROXY_SETTINGS;
 
 	function socialink_load_networks(){
+		global $SOCIALINK_PROXY_SETTINGS;
 		
 		if($networks = socialink_get_available_networks()){
+			// load networks
 			foreach($networks as $network){
 				require_once(dirname(__FILE__) . "/networks/" . $network . ".php");
+			}
+			
+			// get proxy settings
+			$proxy_host = get_plugin_setting("proxy_host", "socialink");
+			$proxy_port = (int) get_plugin_setting("proxy_port", "socialink");
+			
+			if(!empty($proxy_host)){
+				$SOCIALINK_PROXY_SETTINGS = array(
+					"host" => $proxy_host,
+					"port" => $proxy_port
+				);
 			}
 		}
 	}
@@ -151,6 +165,18 @@
 	function socialink_validate_network($network, $user_guid){
 		
 		$result = call_user_func("socialink_" . $network . "_validate_connection", $user_guid);
+		
+		return $result;
+	}
+	
+	function socialink_get_proxy_settings(){
+		global $SOCIALINK_PROXY_SETTINGS;
+		
+		$result = false;
+		
+		if(!empty($SOCIALINK_PROXY_SETTINGS)){
+			$result = $SOCIALINK_PROXY_SETTINGS;
+		}
 		
 		return $result;
 	}

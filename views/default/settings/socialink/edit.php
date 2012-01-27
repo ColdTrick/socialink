@@ -62,6 +62,12 @@
 			<td><?php echo elgg_view("input/pulldown", array("internalname" => "params[enable_openbibid]", "value" => $plugin->enable_openbibid, "options_values" => $yesno_options, "js" => "onchange='socialink_settings_show_section(\"openbibid\", this);'")); ?></td>
 		</tr>
 	</table>
+	
+	<div><?php echo elgg_echo("socialink:settings:proxy:host"); ?></div>
+	<?php echo elgg_view("input/text", array("internalname" => "params[proxy_host]", "value" => $plugin->proxy_host)); ?>
+	
+	<div><?php echo elgg_echo("socialink:settings:proxy:port"); ?></div>
+	<?php echo elgg_view("input/text", array("internalname" => "params[proxy_port]", "value" => $plugin->proxy_port)); ?>
 </div>
 
 <div id="socialink_settings_accordion">

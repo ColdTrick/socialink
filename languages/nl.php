@@ -1,5 +1,7 @@
 <?php
 $language = array (
+  'socialink:settings:proxy:host' => 'Proxy host',
+  'socialink:settings:proxy:port' => 'Proxy poort',
   'socialink:network:openbibid' => 'OpenBibID',
   'socialink:settings:general:header' => 'Algemene instellingen',
   'socialink:settings:enable:openbibid' => 'Schakel OpenBibID ondersteuning in',
