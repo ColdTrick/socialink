@@ -69,12 +69,14 @@
 			echo "</table>";
 		}*/
 		
-		echo "<br />";
-		$rights = socialink_openbibid_validate_user_permission($user->getGUID());
-		echo "check rights: " . var_export($rights, true) . "<br />";
-		
-		$ip = socialink_openbibid_validate_ip_permission();
-		echo "check IP: " . var_export($ip, true) . "<br />";
+		if(isadminloggedin()){
+			echo "<br />";
+			$rights = socialink_openbibid_validate_user_permission($user->getGUID());
+			echo "check rights: " . var_export($rights, true) . "<br />";
+			
+			$ip = socialink_openbibid_validate_ip_permission();
+			echo "check IP: " . var_export($ip, true) . "<br />";
+		}
 		
 	} else {
 		$link_begin = "<a href='" . $vars["url"] . "pg/socialink/forward/openbibid/authorize' target='_self'>";
