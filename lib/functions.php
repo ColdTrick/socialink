@@ -119,7 +119,9 @@
 				$available = array();
 				
 				foreach($networks as $network){
-					if(call_user_func("socialink_" . $network . "_available")){
+					$function = "socialink_" . $network . "_available";
+					
+					if(is_callable($function) && call_user_func($function)){
 						$available[] = $network;
 					}
 				}
@@ -153,7 +155,9 @@
 		
 		if($available_networks = socialink_get_available_networks()){
 			foreach($available_networks as $network){
-				if(call_user_func("socialink_" . $network . "_is_connected", $user_guid)){
+				$function = "socialink_" . $network . "_is_connected";
+				
+				if(is_callable($function) && call_user_func($function, $user_guid)){
 					$result[] = $network;
 				}
 			}
@@ -163,8 +167,12 @@
 	}
 	
 	function socialink_validate_network($network, $user_guid){
+		$result = true;
 		
-		$result = call_user_func("socialink_" . $network . "_validate_connection", $user_guid);
+		$function = "socialink_" . $network . "_validate_connection";
+		if(is_callable($function)){
+			$result = call_user_func($function, $user_guid);
+		}
 		
 		return $result;
 	}
@@ -225,7 +233,9 @@
 				)
 			);
 			
-			$result = $fields[$network];
+			if(array_key_exists($network, $fields)){
+				$result = $fields[$network];
+			}
 		}
 		
 		return $result;
@@ -283,4 +293,3 @@
 		return $result;
 	}
 	
-?>
