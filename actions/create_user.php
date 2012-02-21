@@ -44,9 +44,6 @@
 					// log last network
 					elgg_set_plugin_user_setting("last_login_network", $network, $user->getGUID(), "socialink");
 					
-					// sync network data
-					elgg_trigger_plugin_hook("socialink:sync", "user", array("user" => $user, "network" => $network));
-					
 					// check if we need to forward to something
 					if (!empty($_SESSION["last_forward_from"])) {
 						$forward_url = $_SESSION["last_forward_from"];
