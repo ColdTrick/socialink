@@ -320,6 +320,9 @@
 									elgg_set_plugin_user_setting("hyves_methods", serialize($token->getMethods()), $user_guid, "socialink");
 									elgg_set_plugin_user_setting("hyves_expires", $token->getExpiredate(), $user_guid, "socialink");
 									
+									// sync user data
+									socialink_hyves_sync_profile_metadata($user->getGUID());
+									
 									// trigger hook for registration
 									$params = array(
 										"user" => $user,

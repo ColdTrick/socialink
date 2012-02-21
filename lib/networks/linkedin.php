@@ -363,6 +363,9 @@
 									elgg_set_plugin_user_setting('linkedin_oauth_token', $token['oauth_token'], $user_guid, "socialink");
 									elgg_set_plugin_user_setting('linkedin_oauth_secret', $token['oauth_token_secret'], $user_guid, "socialink");
 									
+									// sync user data
+									socialink_linkedin_sync_profile_metadata($user->getGUID());
+									
 									// trigger hook for registration
 									$params = array(
 										"user" => $user,

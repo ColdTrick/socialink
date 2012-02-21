@@ -7,6 +7,7 @@ x.x:
 - fixed: forwarding error on non linked accounts
 - fixed: performance of socialink_get_available_networks()
 - fixed: no profile data sync after no linked account -> link
+- fixed: no profile data sync after no linked account -> create
 
 1.0 beta 2 (2011-10-26):
 

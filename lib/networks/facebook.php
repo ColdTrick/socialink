@@ -336,6 +336,9 @@
 										// no need for uservalidationbyemail
 										elgg_unregister_plugin_hook_handler("register", "user", "uservalidationbyemail_disable_new_user");
 										
+										// sync user data
+										socialink_facebook_sync_profile_metadata($user->getGUID());
+										
 										// trigger hook for registration
 										$params = array(
 											"user" => $user,
