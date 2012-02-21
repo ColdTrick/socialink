@@ -62,6 +62,9 @@
 				}
 	
 				$SESSION->offsetUnset("socialink_token");
+				
+				// sync network data
+				elgg_trigger_plugin_hook("socialink:sync", "user", array("user" => $entity, "network" => $link_network));
 			}
 			
 			// check if network connections are still valid
