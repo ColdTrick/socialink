@@ -10,6 +10,7 @@ x.x:
 - fixed: performance of socialink_get_available_networks()
 - fixed: no profile data sync after no linked account -> link
 - fixed: no profile data sync after no linked account -> create
+- fixed: potential apache/php warning is some functions
 
 1.0 beta 2 (2011-10-26):
 

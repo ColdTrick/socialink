@@ -10,10 +10,12 @@
 					if($setting == "yes"){
 						$connected = "socialink_" . $network . "_is_connected";
 							
-						if(call_user_func($connected)){
+						if(is_callable($connected) && call_user_func($connected)){
 							$post_message = "socialink_" . $network . "_post_message";
 
-							call_user_func($post_message, $entity->description, $entity->getOwner());
+							if(is_callable($post_message)){
+								call_user_func($post_message, $entity->description, $entity->getOwner());
+							}
 						}
 					}
 				}
@@ -75,8 +77,12 @@
 					
 					if($response === false){
 						// disconnect from this network and report to user
-						call_user_func("socialink_" . $network . "_remove_connection", $entity->getGUID());
-						register_error(sprintf(elgg_echo("socialink:network_invalid"), elgg_echo("socialink:network:" . $network)));
+						$function = "socialink_" . $network . "_remove_connection";
+						
+						if(is_callable($function)){
+							call_user_func($function, $entity->getGUID());
+							register_error(sprintf(elgg_echo("socialink:network_invalid"), elgg_echo("socialink:network:" . $network)));
+						}
 					}
 				}
 			}
