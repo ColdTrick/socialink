@@ -227,7 +227,7 @@
 		if(!empty($user_guid) && ($keys = socialink_linkedin_is_connected($user_guid))){
 			if($api = socialink_linkedin_get_api_object($keys)){
 				try {
-					$response = $api->profile("~:(first-name,last-name,industry,public-profile-url,location:(name))");
+					$response = $api->profile("~:(first-name,last-name,industry,public-profile-url,location:(name),picture-url)");
 					
 					if($result = socialink_linkedin_verify_response($response)){
 						$temp = json_decode($result);
@@ -324,8 +324,60 @@
 						}
 					}
 				}
+				
+				// sync profile icon, only if the user has no icon
+				if(empty($user->icontime)){
+					socialink_linkedin_sync_profile_icon($user->getGUID());
+				}
 			}
 		}
+	}
+	
+	function socialink_linkedin_sync_profile_icon($user_guid = 0){
+		$result = false;
+		
+		if(empty($user_guid)){
+			$user_guid = elgg_get_logged_in_user_guid();
+		}
+		
+		if(($user = get_user($user_guid)) && socialink_linkedin_is_connected($user_guid)){
+			if($api_result = socialink_linkedin_get_profile_information($user_guid)){
+				$api_result = json_decode($api_result);
+				
+				if($icon_url = $api_result->pictureUrl){
+					if(file_get_contents($icon_url)){
+						$icon_sizes = elgg_get_config("icon_sizes");
+						
+						if(!empty($icon_sizes)){
+							$fh = new ElggFile();
+							$fh->owner_guid = $user->getGUID();
+							
+							foreach($icon_sizes as $name => $properties){
+								$resize = get_resized_image_from_existing_file($icon_url, $properties["w"], $properties["h"], $properties["square"], $properties["upscale"]);
+								
+								if(!empty($resize)){
+									$fh->setFilename("profile/" . $user->getGUID() . $name . ".jpg");
+									$fh->open("write");
+									$fh->write($resize);
+									$fh->close();
+									
+									$result = true;
+								}
+							}
+						}
+						
+						if(!empty($result)){
+							$user->icontime = time();
+							
+							// trigger event to let others know the icon was updated
+							elgg_trigger_event("profileiconupdate", $user->type, $user);
+						}
+					}
+				}
+			}
+		}
+		
+		return $result;
 	}
 	
 	function socialink_linkedin_create_user($token, $email){
