@@ -281,8 +281,64 @@
 						}
 					}
 				}
+				
+				// sync profile icon, only if the user has no icon
+				if(empty($user->icontime)){
+					socialink_twitter_sync_profile_icon($user->getGUID());
+				}
 			}
 		}
+	}
+	
+	function socialink_twitter_sync_profile_icon($user_guid = 0){
+		$reuslt = false;
+		
+		if(empty($user_guid)){
+			$user_guid = elgg_get_logged_in_user_guid();
+		}
+		
+		if(($user = get_user($user_guid)) && ($keys = socialink_twitter_is_connected($user_guid))){
+			if($api = socialink_twitter_get_api_object($keys)){
+				$url = $api->host . "users/profile_image/";
+				$params = array(
+					"screen_name" => elgg_get_plugin_user_setting("twitter_screen_name", $user_guid, "socialink"),
+					"size" => "original"
+				);
+				
+				$url = elgg_http_add_url_query_elements($url, $params);
+				
+				if(file_get_contents($url)){
+					$icon_sizes = elgg_get_config("icon_sizes");
+					
+					if(!empty($icon_sizes)){
+						$fh = new ElggFile();
+						$fh->owner_guid = $user->getGUID();
+						
+						foreach($icon_sizes as $name => $properties){
+							$resize = get_resized_image_from_existing_file($url, $properties["w"], $properties["h"], $properties["square"], $properties["upscale"]);
+							
+							if(!empty($resize)){
+								$fh->setFilename("profile/" . $user->getGUID() . $name . ".jpg");
+								$fh->open("write");
+								$fh->write($resize);
+								$fh->close();
+								
+								$result = true;
+							}
+						}
+					}
+					
+					if(!empty($result)){
+						$user->icontime = time();
+						
+						// trigger event to let others know the icon was updated
+						elgg_trigger_event("profileiconupdate", $user->type, $user);
+					}
+				}
+			}
+		}
+		
+		return $result;
 	}
 	
 	function socialink_twitter_create_user($token, $email){
