@@ -315,7 +315,7 @@
 						$fh->owner_guid = $user->getGUID();
 						
 						foreach($icon_sizes as $name => $properties){
-							$resize = get_resized_image_from_existing_file($url, $properties["w"], $properties["h"], $properties["square"], $properties["upscale"]);
+							$resize = get_resized_image_from_existing_file($url, $properties["w"], $properties["h"], $properties["square"], 0, 0, 0, 0, $properties["upscale"]);
 							
 							if(!empty($resize)){
 								$fh->setFilename("profile/" . $user->getGUID() . $name . ".jpg");
