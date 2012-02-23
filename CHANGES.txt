@@ -5,6 +5,7 @@ x.x:
 - added: Twitter icon sync if user has no icon
 - added: LinkedIn icon sync if user has no icon
 - added: Facebook icon sync if user has no icon
+- added: Hyves icon sync if user has no icon
 - fixed: create account system message problem
 - fixed: problems with Hyves login
 - fixed: forwarding error on non linked accounts

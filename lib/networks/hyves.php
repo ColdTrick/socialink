@@ -182,7 +182,7 @@
 				$method = "users.get";
 				$params = array(
 					"userid" => $token->getUserid(),
-					"ha_responsefields" => "cityname,countryname,tags,aboutme"
+					"ha_responsefields" => "cityname,countryname,tags,aboutme,profilepicture"
 				);
 				
 				try {
@@ -276,8 +276,60 @@
 						}
 					}
 				}
+				
+				// sync profile icon, only if the user has no icon
+				if(empty($user->icontime)){
+					socialink_hyves_sync_profile_icon($user->getGUID());
+				}
 			}
 		}
+	}
+	
+	function socialink_hyves_sync_profile_icon($user_guid = 0){
+		$result = false;
+		
+		if(empty($user_guid)){
+			$user_guid = elgg_get_logged_in_user_guid();
+		}
+		
+		if(($user = get_user($user_guid)) && socialink_hyves_is_connected($user_guid)){
+			if($api_result = socialink_hyves_get_profile_information($user_guid)){
+				if(!empty($api_result->profilepicture) && !empty($api_result->profilepicture->image_fullscreen)){
+					$url = $api_result->profilepicture->image_fullscreen->src;
+					
+					if(file_get_contents($url)){
+						$icon_sizes = elgg_get_config("icon_sizes");
+							
+						if(!empty($icon_sizes)){
+							$fh = new ElggFile();
+							$fh->owner_guid = $user->getGUID();
+					
+							foreach($icon_sizes as $name => $properties){
+								$resize = get_resized_image_from_existing_file($url, $properties["w"], $properties["h"], $properties["square"], 0, 0, 0, 0, $properties["upscale"]);
+									
+								if(!empty($resize)){
+									$fh->setFilename("profile/" . $user->getGUID() . $name . ".jpg");
+									$fh->open("write");
+									$fh->write($resize);
+									$fh->close();
+					
+									$result = true;
+								}
+							}
+						}
+							
+						if(!empty($result)){
+							$user->icontime = time();
+					
+							// trigger event to let others know the icon was updated
+							elgg_trigger_event("profileiconupdate", $user->type, $user);
+						}
+					}
+				}
+			}
+		}
+		
+		return $result;
 	}
 	
 	function socialink_hyves_create_user(GenusOAuthAccessToken $token, $email){
