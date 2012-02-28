@@ -11,7 +11,11 @@
 				"secret" => $keys["app_secret"]
 			);
 			
-			$result = new Facebook($config);
+			$result = new FacebookProxy($config);
+			
+			if($proxy_settings = socialink_get_proxy_settings()){
+				$result->setProxySettings($proxy_settings);
+			}
 		}
 		
 		return $result;

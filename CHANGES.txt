@@ -2,6 +2,7 @@
 x.x:
 
 - added: proxy settings
+- added: proxy support for Facebook
 - fixed: small error in removing Twitter connection
 - fixed: potential Apache/PHP warning
 
