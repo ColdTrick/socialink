@@ -7,8 +7,11 @@
 	
 		if(!empty($keys) && is_array($keys)){
 			$oauth_consumer = new GenusOAuthConsumer($keys["consumer_key"], $keys["consumer_secret"]);
+			$result = new HyvesProxy($oauth_consumer, SOCIALINK_HYVES_API_VERSION);
 			
-			$result = new GenusApis($oauth_consumer, SOCIALINK_HYVES_API_VERSION);
+			if($proxy_settings = socialink_get_proxy_settings()){
+				$result->setProxySettings($proxy_settings);
+			}
 		}
 	
 		return $result;
