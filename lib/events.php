@@ -61,6 +61,9 @@
 					case "hyves":
 						socialink_hyves_authorize($entity->getGUID());
 						break;
+					case "openbibid":
+						socialink_openbibid_authorize($entity->getGUID());
+						break;
 				}
 	
 				$SESSION->offsetUnset("socialink_token");

@@ -16,6 +16,7 @@
 		'socialink:network:linkedin' => "LinkedIn",
 		'socialink:network:facebook' => "Facebook",
 		'socialink:network:hyves' => "Hyves",
+		'socialink:network:openbibid' => "OpenBibID",
 	
 		// profile fields
 		'profile:twitter_name' => "Name",	
@@ -79,6 +80,7 @@
 		'socialink:settings:enable:facebook' => "Enable Facebook support",
 		'socialink:settings:enable:linkedin' => "Enable LinkedIn support",
 		'socialink:settings:enable:hyves' => "Enable Hyves support",
+		'socialink:settings:enable:openbibid' => "Enable OpenBibID support",
 		
 		'socialink:settings:proxy:host' => "Proxy host",
 		'socialink:settings:proxy:port' => "Proxy port",
@@ -120,6 +122,14 @@
 		'socialink:settings:hyves:sync_profile_fields' => "Sync Hyves fields to profile",
 		'socialink:settings:hyves:hyves_field' => "Hyves field",
 		
+		'socialink:settings:openbibid:header' => "OpenBibID settings",
+		'socialink:settings:openbibid:api:consumer_key' => "API key",
+		'socialink:settings:openbibid:api:consumer_secret' => "API secret",
+		'socialink:settings:openbibid:allow_login' => "Allow login by OpenBibID",
+		'socialink:settings:openbibid:allow_create' => "Allow account creation by OpenBibID",
+		'socialink:settings:openbibid:sync_profile_fields' => "Sync OpenBibID fields to profile",
+		'socialink:settings:openbibid:linkedin_field' => "OpenBibID field",
+	
 		// user settings
 		'socialink:usersettings:no_access' => "The usersettings for this plugin can only be managed by the owning user, not by an administrator",
 		
@@ -142,6 +152,9 @@
 		
 		'socialink:usersettings:hyves:not_connected' => "Your account is not yet connected to you Hyves account. To link your accounts please click on %sthis link%s.",
 		'socialink:usersettings:hyves:remove' => "Your account is linked to your Hyves account. %sRevoke Access%s",
+		
+		'socialink:usersettings:openbibid:not_connected' => "Your account is not yet connected to you OpenBibId account. To link your accounts please click on %sthis link%s.",
+		'socialink:usersettings:openbibid:remove' => "Your account is linked to your OpenBibId account. %sRevoke Access%s",
 		
 		'socialink:usersettings:twitter:thewire' => "Post your Wire messages to Twitter",
 		'socialink:usersettings:facebook:thewire' => "Post your Wire messages to Facebook",

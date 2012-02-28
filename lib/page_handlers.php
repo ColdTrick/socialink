@@ -2,7 +2,7 @@
 
 	function socialink_page_handler($page){
 		global $CONFIG;
-	
+	ini_set("display_errors", true);
 		switch($page[0]){
 			case "authorize":
 				gatekeeper();
@@ -14,6 +14,7 @@
 					case "linkedin":
 					case "facebook":
 					case "hyves":
+					case "openbibid":
 						if(call_user_func("socialink_" . $page[1] . "_authorize")){
 							system_message(elgg_echo("socialink:authorize:success", array(elgg_echo("socialink:network:" . $page[1]))));
 						} else {
@@ -142,6 +143,32 @@
 							}
 							
 							break;
+						case "openbibid":
+							$token = socialink_openbibid_get_access_token(get_input('oauth_verifier'));
+						
+							if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
+								$params = array(
+									"type" => "user",
+									"limit" => 1,
+									"site_guids" => false,
+									"plugin_id" => "socialink",
+									"plugin_user_setting_name_value_pairs" => array(
+										"openbibid_user_id" => $token['userId']
+									)
+								);
+								
+								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
+									$user = $users[0];
+										
+									socialink_openbibid_update_connection($token, $user->getGUID());
+								} else {
+									$_SESSION["socialink_token"] = $token;
+									forward("pg/socialink/no_linked_account/openbibid");
+								}
+							} else {
+								register_error($error_msg_no_user);
+							}
+							break;
 					}
 					
 					if($user instanceof ElggUser){
@@ -187,6 +214,7 @@
 						case "facebook":
 						case "twitter":
 						case "hyves":
+						case "openbibid":
 							set_input("network", $page[1]);
 							include(dirname(dirname(__FILE__)) . "/pages/no_linked_account.php");
 							
@@ -228,6 +256,9 @@
 								break;
 							case "hyves":
 								$forward_url = socialink_hyves_get_authorize_url($callback_url);
+								break;
+							case "openbibid":
+								$forward_url = socialink_openbibid_get_authorize_url($callback_url);
 								break;
 						}
 	

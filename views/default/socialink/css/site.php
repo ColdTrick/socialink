@@ -25,6 +25,12 @@
 	height: 25px;
 }
 
+#socialink_usersettings_openbibid_icon {
+	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/openbibid/logo_85x84.jpg") transparent top left no-repeat;
+	width: 85px;
+	height: 84px;
+}
+
 #socialink_login a{
 	margin-left: 5px;
 	vertical-align: middle;
@@ -50,21 +56,24 @@
 #socialink_twitter_sync_configure,
 #socialink_facebook_sync_configure,
 #socialink_linkedin_sync_configure,
-#socialink_hyves_sync_configure {
+#socialink_hyves_sync_configure,
+#socialink_openbibid_sync_configure {
 	display: none;
 }
 
 #socialink_twitter_sync_configure.socialink_network_sync_allow,
 #socialink_facebook_sync_configure.socialink_network_sync_allow,
 #socialink_linkedin_sync_configure.socialink_network_sync_allow,
-#socialink_hyves_sync_configure.socialink_network_sync_allow {
+#socialink_hyves_sync_configure.socialink_network_sync_allow,
+#socialink_openbibid_sync_configure.socialink_network_sync_allow {
 	display: inline-block;
 }
 
 #socialink_twitter_sync_fields,
 #socialink_facebook_sync_fields,
 #socialink_linkedin_sync_fields,
-#socialink_hyves_sync_fields {
+#socialink_hyves_sync_fields,
+#socialink_openbibid_sync_fields {
 	display: none;
 	width: 100%;
 }
@@ -72,7 +81,8 @@
 #socialink_twitter_sync_fields th,
 #socialink_facebook_sync_fields th,
 #socialink_linkedin_sync_fields th,
-#socialink_hyves_sync_fields th {
+#socialink_hyves_sync_fields th,
+#socialink_openbibid_sync_fields th {
 	text-align: left;
 }
 

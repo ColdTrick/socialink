@@ -1,5 +1,16 @@
 <?php
 $language = array (
+  'socialink:network:openbibid' => 'OpenBibID',
+  'socialink:settings:enable:openbibid' => 'Schakel OpenBibID ondersteuning in',
+  'socialink:settings:openbibid:header' => 'OpenBibID instellingen',
+  'socialink:settings:openbibid:api:consumer_key' => 'API key',
+  'socialink:settings:openbibid:api:consumer_secret' => 'API secret',
+  'socialink:settings:openbibid:allow_login' => 'Aanmelden met OpenBibID',
+  'socialink:settings:openbibid:allow_create' => 'Account creatie met OpenBibID',
+  'socialink:settings:openbibid:sync_profile_fields' => 'Synchroniseer OpenBibIDvelden naar profiel',
+  'socialink:settings:openbibid:linkedin_field' => 'OpenBibIDveld',
+  'socialink:usersettings:openbibid:not_connected' => 'Je account is nog niet gekoppeld met je OpenBibIDaccount. Om de account te koppelen klik op %sdeze link%s',
+  'socialink:usersettings:openbibid:remove' => 'Je account is gekoppeld met je OpenBibID account. %sVerwijder koppeling%s',
   'socialink:settings:proxy:host' => 'Proxy host',
   'socialink:settings:proxy:port' => 'Proxy poort',
   'socialink:network:hyves' => 'Hyves',

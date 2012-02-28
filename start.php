@@ -21,6 +21,7 @@
 		elgg_register_library("socialink:linkedin", dirname(__FILE__) . "/lib/networks/linkedin.php");
 		elgg_register_library("socialink:twitter", dirname(__FILE__) . "/lib/networks/twitter.php");
 		elgg_register_library("socialink:hyves", dirname(__FILE__) . "/lib/networks/hyves.php");
+		elgg_register_library("socialink:openbibid", dirname(__FILE__) . "/lib/networks/openbibid.php");
 		
 		// extend CSS
 		elgg_extend_view("css/elgg", "socialink/css/site");
