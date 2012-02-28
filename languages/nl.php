@@ -1,5 +1,7 @@
 <?php
 $language = array (
+  'socialink:settings:proxy:host' => 'Proxy host',
+  'socialink:settings:proxy:port' => 'Proxy poort',
   'socialink:network:hyves' => 'Hyves',
   'socialink:hyves:field:name' => 'Naam',
   'socialink:hyves:field:firstname' => 'Voornaam',

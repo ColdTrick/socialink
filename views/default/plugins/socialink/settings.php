@@ -51,6 +51,13 @@
 			<td><?php echo elgg_view("input/dropdown", array("name" => "params[enable_hyves]", "value" => $plugin->enable_hyves, "options_values" => $yesno_options)); ?></td>
 		</tr>
 	</table>
+	
+	<div><?php echo elgg_echo("socialink:settings:proxy:host"); ?></div>
+	<?php echo elgg_view("input/text", array("name" => "params[proxy_host]", "value" => $plugin->proxy_host)); ?>
+	 
+	<div><?php echo elgg_echo("socialink:settings:proxy:port"); ?></div>
+	<?php echo elgg_view("input/text", array("name" => "params[proxy_port]", "value" => $plugin->proxy_port)); ?>
+	 
 </div>
 
 <div id="socialink_settings_accordion">

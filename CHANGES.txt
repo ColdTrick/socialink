@@ -1,6 +1,7 @@
 = Version history =
 x.x:
 
+- added: proxy settings
 - fixed: small error in removing Twitter connection
 - fixed: potential Apache/PHP warning
 

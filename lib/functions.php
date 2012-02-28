@@ -1,9 +1,24 @@
 <?php 
 
+	global $SOCIALINK_PROXY_SETTINGS;
+
 	function socialink_load_networks(){
+		global $SOCIALINK_PROXY_SETTINGS;
+		
 		if($networks = socialink_get_available_networks()){
 			foreach($networks as $network){
 				elgg_load_library("socialink:" . $network);
+			}
+			
+			// get proxy settings
+			$proxy_host = elgg_get_plugin_setting("proxy_host", "socialink");
+			$proxy_port = (int) elgg_get_plugin_setting("proxy_port", "socialink");
+			
+			if(!empty($proxy_host)){
+				$SOCIALINK_PROXY_SETTINGS = array(
+					"host" => $proxy_host,
+					"port" => $proxy_port
+				);
 			}
 		}
 	}
@@ -158,6 +173,18 @@
 			$result = call_user_func($function, $user_guid);
 		}
 		
+		return $result;
+	}
+	
+	function socialink_get_proxy_settings(){
+		global $SOCIALINK_PROXY_SETTINGS;
+	
+		$result = false;
+	
+		if(!empty($SOCIALINK_PROXY_SETTINGS)){
+			$result = $SOCIALINK_PROXY_SETTINGS;
+		}
+	
 		return $result;
 	}
 	
