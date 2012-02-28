@@ -215,7 +215,9 @@
 				)
 			);
 			
-			$result = $fields[$network];
+			if(array_key_exists($network, $fields)){
+				$result = $fields[$network];
+			}
 		}
 		
 		return $result;
