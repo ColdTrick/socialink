@@ -4,6 +4,7 @@ x.x:
 - added: proxy settings
 - added: proxy support for Facebook
 - added: proxy support for Twitter
+- added: proxy support for LInkedIn
 - fixed: small error in removing Twitter connection
 - fixed: potential Apache/PHP warning
 

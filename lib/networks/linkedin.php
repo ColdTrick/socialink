@@ -10,7 +10,7 @@
 			);
 			
 			try {
-				$api = new LinkedIn($api_config);
+				$api = new LinkedInProxy($api_config);
 				
 				if(isset($keys["oauth_token"]) && isset($keys["oauth_secret"])){
 					$tokens = array(
@@ -23,6 +23,10 @@
 				
 				// set response format to JSON 
 				$api->setResponseFormat(LinkedIn::_RESPONSE_JSON);
+				
+				if($proxy_settings = socialink_get_proxy_settings()){
+					$api->setProxySettings($proxy_settings);
+				}
 				
 				$result = $api;
 			} catch(Exception $e){}
