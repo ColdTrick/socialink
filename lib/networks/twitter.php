@@ -154,7 +154,7 @@
 			$user_guid = elgg_get_logged_in_user_guid();
 		}
 		
-		if(!empty($user_guid) && socialink_twitter_is_connected()){
+		if(!empty($user_guid) && socialink_twitter_is_connected($user_guid)){
 			elgg_unset_plugin_user_setting("twitter_oauth_token", $user_guid, "socialink");
 			elgg_unset_plugin_user_setting("twitter_oauth_secret", $user_guid, "socialink");
 			elgg_unset_plugin_user_setting("twitter_screen_name", $user_guid, "socialink");
