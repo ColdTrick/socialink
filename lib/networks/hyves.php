@@ -53,7 +53,8 @@
 			if($api = socialink_hyves_get_api_object($keys)){
 				try {
 					$methods = array(
-						"users.get"
+						"users.get",
+						"wwws.create"
 					);
 					
 					$token = $api->retrieveRequesttoken($methods, "infinite");
@@ -168,6 +169,33 @@
 			$result = true;
 		}
 	
+		return $result;
+	}
+		
+	function socialink_hyves_post_message($message, $user_guid = 0){
+		$result = false;
+		
+		if(empty($user_guid)){
+			$user_guid = elgg_get_logged_in_user_guid();
+		}
+		
+		if(!empty($message) && !empty($user_guid) && ($keys = socialink_hyves_is_connected($user_guid))){
+			if($api = socialink_hyves_get_api_object($keys)){
+				$token = new GenusOAuthAccessToken($keys["oauth_token"], $keys["oauth_secret"], $keys["user_id"], $keys["methods"], $keys["expires"]);
+//				$waar = "Geen idee...";
+				$method = "wwws.create";
+    				$params = array("emotion" => $message,
+//                        	"where" => $waar, 
+                       		"visibility" => "friend");
+				
+				try {
+					if($api_result = $api->doMethod($method, $params, $token)){
+						$result = $api_result->user;
+					}
+				} catch(Exception $e){}
+			}
+		}
+		
 		return $result;
 	}
 	
