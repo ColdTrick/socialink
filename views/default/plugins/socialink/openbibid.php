@@ -1,6 +1,7 @@
-<?php 
-	$user = $vars["user"];
-	$usersettings = $vars["entity"];
+<?php
+ 
+	$user = elgg_get_page_owner_entity();
+	$plugin = elgg_extract("entity", $vars);
 	
 	// for yes/no pulldowns
 	$yesno_options_values = array(
@@ -35,9 +36,9 @@
 			echo "<br />";
 			echo "<div>";
 			echo sprintf(elgg_echo("socialink:usersettings:profile_sync"), $network_name);
-			echo "&nbsp;" . elgg_view("input/pulldown", array("internalname" => "params[openbibid_sync_allow]", "options_values" => array_reverse($yesno_options_values), "value" => $usersettings->openbibid_sync_allow, "js" => "onchange='socialink_toggle_network_configure(this, \"openbibid\");'"));
+			echo "&nbsp;" . elgg_view("input/pulldown", array("internalname" => "params[openbibid_sync_allow]", "options_values" => array_reverse($yesno_options_values), "value" => $plugin->getUserSetting("openbibid_sync_allow"), "js" => "onchange='socialink_toggle_network_configure(this, \"openbibid\");'"));
 			echo "&nbsp;<span id='socialink_openbibid_sync_configure' ";
-			if($usersettings->openbibid_sync_allow != "no"){
+			if($plugin->getUserSetting("openbibid_sync_allow") != "no"){
 				echo "class='socialink_network_sync_allow'";
 			}
 			echo "><a href='javascript:void(0);' onclick='$(\"#socialink_openbibid_sync_fields\").toggle();'>" . elgg_echo("socialink:configure") . "</a></span>";
@@ -62,7 +63,7 @@
 				
 				echo "<tr>";
 				echo "<td>" . sprintf(elgg_echo("socialink:usersettings:profile_sync:explain"), $network_string, $profile_string) . "</td>";
-				echo "<td>" . elgg_view("input/pulldown", array("internalname" => "params[" . $setting . "]", "options_values" => array_reverse($yesno_options_values, true), "value" => $usersettings->$setting)) . "</td>";
+				echo "<td>" . elgg_view("input/pulldown", array("internalname" => "params[" . $setting . "]", "options_values" => array_reverse($yesno_options_values, true), "value" => $plugin->getUserSetting($setting))) . "</td>";
 				echo "<tr>";
 			}
 			

@@ -1,13 +1,14 @@
 <?php 
-	$user = $vars["user"];
-	$usersettings = $vars["entity"];
+	
+	$user = elgg_get_page_owner_entity();
+	$plugin = elgg_extract("entity", $vars);
 	
 	// for yes/no dropdowns
 	$yesno_options_values = array(
 		"no" => elgg_echo("option:no"),
 		"yes" => elgg_echo("option:yes")
 	);
-
+	
 	echo "<div>";
 	echo "<div class='socialink_usersettings_network_icon' id='socialink_usersettings_facebook_icon'></div>";
 	echo "<div class='socialink_usersettings_network_config'>";
@@ -36,9 +37,9 @@
 			echo "<br />";
 			echo "<div>";
 			echo elgg_echo("socialink:usersettings:profile_sync", array($network_name));
-			echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[facebook_sync_allow]", "options_values" => array_reverse($yesno_options_values), "value" => $usersettings->facebook_sync_allow, "js" => "onchange='socialink_toggle_network_configure(this, \"facebook\");'"));
+			echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[facebook_sync_allow]", "options_values" => array_reverse($yesno_options_values), "value" => $plugin->getUserSetting("facebook_sync_allow"), "js" => "onchange='socialink_toggle_network_configure(this, \"facebook\");'"));
 			echo "&nbsp;<span id='socialink_facebook_sync_configure' ";
-			if($usersettings->facebook_sync_allow != "no"){
+			if($plugin->getUserSetting("facebook_sync_allow") != "no"){
 				echo "class='socialink_network_sync_allow'";
 			}
 			echo "><a href='javascript:void(0);' onclick='$(\"#socialink_facebook_sync_fields\").toggle();'>" . elgg_echo("socialink:configure") . "</a></span>";
@@ -63,7 +64,7 @@
 				
 				echo "<tr>";
 				echo "<td>" . elgg_echo("socialink:usersettings:profile_sync:explain", array($network_string, $profile_string)) . "</td>";
-				echo "<td>" . elgg_view("input/dropdown", array("name" => "params[" . $setting . "]", "options_values" => array_reverse($yesno_options_values, true), "value" => $usersettings->$setting)) . "</td>";
+				echo "<td>" . elgg_view("input/dropdown", array("name" => "params[" . $setting . "]", "options_values" => array_reverse($yesno_options_values, true), "value" => $plugin->getUserSetting($setting))) . "</td>";
 				echo "<tr>";
 			}
 			

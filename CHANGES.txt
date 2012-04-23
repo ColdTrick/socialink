@@ -1,4 +1,8 @@
 = Version history =
+x.x:
+
+- changed: handling of plugin usersettings
+
 1.1 (2012-03-02):
 
 - added: proxy settings

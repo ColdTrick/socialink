@@ -1,7 +1,7 @@
 <?php 
 
-	$user = $vars["user"];
-	$usersettings = $vars["entity"];
+	$user = elgg_get_page_owner_entity();
+	$plugin = elgg_extract("entity", $vars);
 	
 	// for yes/no dropdowns
 	$noyes_options_values = array(
@@ -16,7 +16,7 @@
 	// is the user conntected
 	if(socialink_twitter_is_connected($user->getGUID())){
 		$twitter_remove_link = elgg_add_action_tokens_to_url($vars["url"] . "action/socialink/remove?service=twitter");
-		$twitter_screen_name = elgg_get_plugin_user_setting("twitter_screen_name", $user->getGUID(), "socialink");
+		$twitter_screen_name = $plugin->getUserSetting("twitter_screen_name");
 		
 		$link_begin = "<a href='" . $twitter_remove_link . "'>";
 		$link_end = "</a>";
@@ -38,9 +38,9 @@
 			echo "<br />";
 			echo "<div>";
 			echo elgg_echo("socialink:usersettings:profile_sync", array($network_name));
-			echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[twitter_sync_allow]", "options_values" => array_reverse($noyes_options_values), "value" => $usersettings->twitter_sync_allow, "js" => "onchange='socialink_toggle_network_configure(this, \"twitter\");'"));
+			echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[twitter_sync_allow]", "options_values" => array_reverse($noyes_options_values), "value" => $plugin->getUserSetting("twitter_sync_allow"), "js" => "onchange='socialink_toggle_network_configure(this, \"twitter\");'"));
 			echo "&nbsp;<span id='socialink_twitter_sync_configure' ";
-			if($usersettings->twitter_sync_allow != "no"){
+			if($plugin->getUserSetting("twitter_sync_allow") != "no"){
 				echo "class='socialink_network_sync_allow'";
 			}
 			echo "><a href='javascript:void(0);' onclick='$(\"#socialink_twitter_sync_fields\").toggle();'>" . elgg_echo("socialink:configure") . "</a></span>";
@@ -65,7 +65,7 @@
 				
 				echo "<tr>";
 				echo "<td>" . elgg_echo("socialink:usersettings:profile_sync:explain", array($network_string, $profile_string)) . "</td>";
-				echo "<td>" . elgg_view("input/dropdown", array("name" => "params[" . $setting . "]", "options_values" => array_reverse($noyes_options_values, true), "value" => $usersettings->$setting)) . "</td>";
+				echo "<td>" . elgg_view("input/dropdown", array("name" => "params[" . $setting . "]", "options_values" => array_reverse($noyes_options_values, true), "value" => $plugin->getUserSetting($setting))) . "</td>";
 				echo "<tr>";
 			}
 			
@@ -75,14 +75,14 @@
 		// twitter in
 		if(elgg_is_active_plugin("thewire")){
 			
-			if(($twitter_in = elgg_get_plugin_setting("twitter_allow_in", "socialink")) && ($twitter_in != "no")){
+			if(($twitter_in = $plugin->twitter_allow_in) && ($twitter_in != "no")){
 				echo "<br />";
 				echo "<div>";
 				echo elgg_echo("socialink:usersettings:twitter:in");
-				echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[twitter_in]", "value" => $usersettings->twitter_in, "options_values" => $noyes_options_values));
+				echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[twitter_in]", "value" => $plugin->getUserSetting("twitter_in"), "options_values" => $noyes_options_values));
 				echo "<br />";
 				echo elgg_echo("socialink:usersettings:twitter:in:filter");
-				echo "&nbsp;<input type='text' name='params[twitter_in_filter]' value='" . htmlentities($usersettings->twitter_in_filter, ENT_QUOTES, "UTF-8") . "' size='15' />";
+				echo "&nbsp;<input type='text' name='params[twitter_in_filter]' value='" . htmlentities($plugin->getUserSetting("twitter_in_filter"), ENT_QUOTES, "UTF-8") . "' size='15' />";
 				echo "</div>";
 			}
 		} else {
