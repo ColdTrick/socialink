@@ -428,7 +428,7 @@
 			if($api = socialink_twitter_get_api_object($keys)){
 				try {
 					$url = "account/verify_credentials";
-					$response = $api->get($url, $params);
+					$response = $api->get($url);
 					
 					if(!empty($response) && !empty($response->error)){
 						$result = false;	

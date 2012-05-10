@@ -1,6 +1,7 @@
 = Version history =
 x.x:
 
+- fixed: small bug in twitter library
 - changed: handling of plugin usersettings
 
 1.1 (2012-03-02):
