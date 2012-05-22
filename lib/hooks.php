@@ -26,3 +26,12 @@
 			}
 		}
 	}
+	
+	function socialink_walled_garden_hook($hook_name, $entity_type, $return_value, $params){
+		$result = $return_value;
+		
+		// add socialink to the public pages
+		$result[] = "socialink/.*";
+		
+		return $result;
+	}

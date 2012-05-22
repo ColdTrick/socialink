@@ -63,6 +63,7 @@
 	
 	// hooks
 	elgg_register_plugin_hook_handler("socialink:sync", "user", "socialink_sync_network_hook");
+	elgg_register_plugin_hook_handler("public_pages", "walled_garden", "socialink_walled_garden_hook");
 	
 	// register actions
 	elgg_register_action("socialink/remove", dirname(__FILE__) . "/actions/remove.php");

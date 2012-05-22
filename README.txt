@@ -39,7 +39,6 @@ Please note that many changes have been made to this API to prevent conflicts wi
 - Twitter in
 - If The Wire to network, prevent twitter deadloops
 - Share content on social networks
-- check walled garden in no linked account
 
 == 4. WordPress ==
 In order to use the WordPress connection you need the OAuth Provider (http://wordpress.org/extend/plugins/oauth-provider/) WordPress plugin installed.
