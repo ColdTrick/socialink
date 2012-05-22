@@ -5,11 +5,12 @@ Log in to your Elgg social network using LinkedIn, Twitter and/or Facebook
 1. Features
 2. External libaries
 3. ToDo
+4. WordPress
 
 == 1. Features ==
-- Connect to Facebook, LinkedIn and Twitter
+- Connect to Facebook, LinkedIn, Twitter, Hyves, OpenBibID and WordPress
 - Login (for registrered users) with social network account
-- Create an account based on Facebook, Twitter or LinkedIn (admin option)
+- Create an account based on Facebook, LinkedIn, Twitter, Hyves, OpenBibID and WordPress (admin option)
 - Link profile data to Elgg profile
 
 == 2. External libaries ==
@@ -39,3 +40,8 @@ Please note that many changes have been made to this API to prevent conflicts wi
 - If The Wire to network, prevent twitter deadloops
 - Share content on social networks
 - check walled garden in no linked account
+
+== 4. WordPress ==
+In order to use the WordPress connection you need the OAuth Provider (http://wordpress.org/extend/plugins/oauth-provider/) WordPress plugin installed.
+
+For now the WordPress connection is experimental
