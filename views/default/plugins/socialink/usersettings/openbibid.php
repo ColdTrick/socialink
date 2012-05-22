@@ -80,7 +80,7 @@
 		}
 		
 	} else {
-		$link_begin = "<a href='" . $vars["url"] . "pg/socialink/forward/openbibid/authorize' target='_self'>";
+		$link_begin = "<a href='" . $vars["url"] . "socialink/forward/openbibid/authorize' target='_self'>";
 		$link_end = "</a>";
 		
 		echo sprintf(elgg_echo("socialink:usersettings:openbibid:not_connected"), $link_begin, $link_end);

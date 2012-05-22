@@ -8,7 +8,7 @@
 		// show settings ofr available networks
 		if($networks = socialink_get_available_networks()){
 			foreach($networks as $network){
-				echo elgg_view("plugins/socialink/" . $network, $vars);
+				echo elgg_view("plugins/socialink/usersettings/" . $network, $vars);
 			}
 		}
 		
