@@ -2,7 +2,7 @@
 
 	$network = $vars["network"];
 
-	$form_data = "<div class='description'>" . elgg_echo("socialink:link_account:description") . "</div>";
+	$form_data = "<div class='mbs'>" . elgg_echo("socialink:link_account:description") . "</div>";
 	
 	$form_data .= "<div>";
 	$form_data .= "<label>" . elgg_echo("loginusername") . "</label>";
@@ -20,7 +20,7 @@
 	
 	$form_data .= "<div>";
 	$form_data .= elgg_view("input/submit", array("value" => elgg_echo("login")));
-	$form_data .= "&nbsp;<a href=\"{$vars['url']}forgotpassword\" target='_blank'>" . elgg_echo('user:password:lost') . "</a>";
+	$form_data .= "&nbsp;" . elgg_view("output/url", array("href" => $vars["url"] . "forgotpassword", "text" => elgg_echo("user:password:lost"), "target" => "_blank"));
 	$form_data .= "</div>";
 	
 	$form_data .= elgg_view("input/hidden", array("name" => "socialink_link_network", "value" => $network));

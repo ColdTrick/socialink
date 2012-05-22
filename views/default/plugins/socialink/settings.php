@@ -31,6 +31,8 @@
 		}
 	}
 	
+	$wordpress_oath_provider_url = "http://wordpress.org/extend/plugins/oauth-provider/";
+	
 ?>
 <div>
 	<table>
@@ -49,6 +51,10 @@
 		<tr>
 			<td><?php echo elgg_echo("socialink:settings:enable:hyves"); ?>&nbsp;</td>
 			<td><?php echo elgg_view("input/dropdown", array("name" => "params[enable_hyves]", "value" => $plugin->enable_hyves, "options_values" => $yesno_options)); ?></td>
+		</tr>
+		<tr>
+			<td><?php echo elgg_echo("socialink:settings:enable:wordpress"); ?>&nbsp;</td>
+			<td><?php echo elgg_view("input/dropdown", array("name" => "params[enable_wordpress]", "value" => $plugin->enable_wordpress, "options_values" => $yesno_options)); ?></td>
 		</tr>
 		<tr>
 			<td><?php echo elgg_echo("socialink:settings:enable:openbibid"); ?>&nbsp;</td>
@@ -266,6 +272,62 @@
 		</div>
 	</div>
 	<!-- End hyves settings -->
+	
+	<!-- WordPress settings -->
+	<div id="socialink_settings_wordpress" class="elgg-module elgg-module-inline">
+		<div class="elgg-head"><h3><?php echo elgg_echo("socialink:settings:wordpress:header"); ?></h3></div>
+		
+		<div class="elgg-body">
+			<div class="mbm"><?php echo elgg_echo("socialink:settings:wordpress:api:description", array($wordpress_oath_provider_url)); ?></div>
+		
+			<div><?php echo elgg_echo("socialink:settings:wordpress:api:url"); ?></div>
+			<?php echo elgg_view("input/url", array("name" => "params[wordpress_url]", "value" => $plugin->wordpress_url)); ?>
+			<div class="elgg-subtext"><?php echo elgg_echo("socialink:settings:wordpress:api:url:description"); ?></div>
+			
+			<div><?php echo elgg_echo("socialink:settings:wordpress:api:consumer_key"); ?></div>
+			<?php echo elgg_view("input/text", array("name" => "params[wordpress_consumer_key]", "value" => $plugin->wordpress_consumer_key)); ?>
+			
+			<div><?php echo elgg_echo("socialink:settings:wordpress:api:consumer_secret"); ?></div>
+			<?php echo elgg_view("input/text", array("name" => "params[wordpress_consumer_secret]", "value" => $plugin->wordpress_consumer_secret)); ?>
+			
+			<br /><br />
+			
+			<div><?php echo elgg_echo("socialink:settings:wordpress:allow_login"); ?></div>
+			<?php echo elgg_view("input/dropdown", array("name" => "params[wordpress_allow_login]", "value" => $plugin->wordpress_allow_login, "options_values" => $yesno_options)); ?>
+			
+			<div><?php echo elgg_echo("socialink:settings:wordpress:allow_create"); ?></div>
+			<?php echo elgg_view("input/dropdown", array("name" => "params[wordpress_allow_create]", "value" => $plugin->wordpress_allow_create, "options_values" => $yesno_options)); ?>
+			
+			<?php /* ?>
+			<br /><br />
+			
+			<div><?php echo elgg_echo("socialink:settings:openbibid:sync_profile_fields"); ?></div>
+			<?php 
+				if($fields = socialink_get_network_fields("openbibid")){
+					?>
+					<table class="elgg-table">
+						<tr>
+							<th><?php echo elgg_echo("socialink:settings:openbibid:openbibid_field"); ?></th>
+							<th><?php echo elgg_echo("socialink:settings:profile_field"); ?></th>
+						</tr>
+						<?php 
+							foreach($fields as $settings_name => $network_name){
+								$setting = "openbibid_profile_" . $settings_name;
+								
+								echo "<tr>\n";
+								echo "<td>" . elgg_echo("socialink:openbibid:field:" . $settings_name) . "</td>\n";
+								echo "<td>" . elgg_view("input/dropdown", array("name" => "params[" . $setting . "]", "options_values" => $profile_options, "value" => $plugin->$setting)) . "</td>\n";
+								echo "</tr>\n";
+							}
+						?>
+					</table>
+					<?php 
+				}
+			?>
+			<?php */ ?>
+		</div>
+	</div>
+	<!-- End WordPress settings -->
 	
 	<!-- openbibid settings -->
 	<div id="socialink_settings_openbibid" class="elgg-module elgg-module-inline">

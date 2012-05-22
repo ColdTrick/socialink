@@ -25,6 +25,12 @@
 	height: 25px;
 }
 
+#socialink_usersettings_wordpress_icon {
+	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/wordpress/logo_88x20.png") transparent top left no-repeat;
+	width: 88px;
+	height: 20px;
+}
+
 #socialink_usersettings_openbibid_icon {
 	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/openbibid/logo_85x84.jpg") transparent top left no-repeat;
 	width: 85px;
@@ -34,10 +40,6 @@
 #socialink_login a{
 	margin-left: 5px;
 	vertical-align: middle;
-}
-
-#socialink_login .disclaimer {
-	color: gray;
 }
 
 #socialink_usersettings .socialink_usersettings_network_icon {
@@ -134,14 +136,6 @@
 	text-align: center;
 }
 
-#socialink_create_account_wrapper .disclaimer {
-	color: #9E9E9E;
-}
-
 #socialink_no_linked_account_container label {
 	font-size: 100%;
-}
-
-#socialink_no_linked_account_container .description {
-	margin-bottom: 5px;
 }

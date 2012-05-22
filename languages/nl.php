@@ -1,5 +1,18 @@
 <?php
 $language = array (
+  'socialink:network:wordpress' => 'WordPress',
+  'socialink:settings:enable:wordpress' => 'Schakel WordPress ondersteuning in',
+  'socialink:settings:wordpress:header' => 'WordPress instellingen',
+  'socialink:settings:wordpress:api:description' => 'Om je WordPress installatie en deze Elgg installatie te koppelen heb je de <a href="%s" target="_blank">OAuth Provider</a> nodig',
+  'socialink:settings:wordpress:api:url' => 'De URL naar je WordPress installatie',
+  'socialink:settings:wordpress:api:url:description' => 'Geef de basis URL van je WordPress installatie op (bijvoorbeeld: http://www.mijn-wordpress.nl/)',
+  'socialink:settings:wordpress:api:consumer_key' => 'Consumer key',
+  'socialink:settings:wordpress:api:consumer_secret' => 'Consumer secret',
+  'socialink:settings:wordpress:allow_login' => 'Aanmelden met WordPress',
+  'socialink:settings:wordpress:allow_create' => 'Account aanmaken met WordPress',
+  'socialink:usersettings:wordpress:not_connected' => 'Je account is nog niet gekoppeld aan je WordPress account. Om je account te koppelen klik op %sdeze link%s.',
+  'socialink:usersettings:wordpress:remove' => 'Je account is gekoppeld aan je WordPress account. %sVerwijder koppeling%s',
+  'socialink:create_account:wordpress:description' => 'Als je nog geen account hebt kun je deze aanmaken door je e-mail adres op te geven en te klikken op de Registreer knop, we maken dan een account aan op basis van je WordPress gebruikersnaam en het opgegeven e-mail adres.',
   'socialink:network:openbibid' => 'OpenBibID',
   'socialink:settings:enable:openbibid' => 'Schakel OpenBibID ondersteuning in',
   'socialink:settings:openbibid:header' => 'OpenBibID instellingen',

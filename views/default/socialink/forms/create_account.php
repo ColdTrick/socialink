@@ -3,9 +3,9 @@
 	$network = $vars["network"];
 	$network_string = elgg_echo("socialink:network:" . $network);
 
-	$form_data = "<div class='description'>" . elgg_echo("socialink:create_account:" . $network . ":description") . "</div>";
+	$form_data = "<div class='mbs'>" . elgg_echo("socialink:create_account:" . $network . ":description") . "</div>";
 	
-	if(in_array($network, array("linkedin", "twitter", "hyves"))){
+	if(in_array($network, array("linkedin", "twitter", "hyves", "wordpress"))){
 		$form_data .= "<div>";
 		$form_data .= "<label>" . elgg_echo("email") . "</label>";
 		$form_data .= elgg_view("input/email", array("name" => "email"));
@@ -20,7 +20,7 @@
 	$form = elgg_view("input/form", array("body" => $form_data,
 										"action" => $vars["url"] . "action/socialink/create_user"));
 	
-	$form .= "<div class='disclaimer'>" . elgg_echo("socialink:create_account:disclaimer") . "</div>";
+	$form .= "<div class='elgg-quiet mts'>" . elgg_echo("socialink:create_account:disclaimer") . "</div>";
 	
 	echo elgg_view_module("popup", 
 							elgg_echo("register"), 

@@ -112,9 +112,29 @@
 	
 		return $result;
 	}
+	
+	function socialink_wordpress_available(){
+		$result = false;
+	
+		if(elgg_get_plugin_setting("enable_wordpress", "socialink") == "yes"){
+			$url = elgg_get_plugin_setting("wordpress_url", "socialink");
+			$consumer_key = elgg_get_plugin_setting("wordpress_consumer_key", "socialink");
+			$consumer_secret = elgg_get_plugin_setting("wordpress_consumer_secret", "socialink");
+				
+			if(!empty($url) && !empty($consumer_key) && !empty($consumer_secret)){
+				$result = array(
+					"url" => $url,
+					"consumer_key" => $consumer_key,
+					"consumer_secret" => $consumer_secret,
+				);
+			}
+		}
+	
+		return $result;
+	}
 
 	function socialink_get_supported_networks(){
-		return array("twitter", "linkedin", "facebook", "hyves", "openbibid");
+		return array("twitter", "linkedin", "facebook", "hyves", "openbibid", "wordpress");
 	}
 	
 	function socialink_is_supported_network($network){

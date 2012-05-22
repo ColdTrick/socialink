@@ -1,8 +1,8 @@
 <?php
 
 	function socialink_page_handler($page){
-		global $CONFIG;
-	ini_set("display_errors", true);
+		$result = false;
+		
 		switch($page[0]){
 			case "authorize":
 				gatekeeper();
@@ -14,6 +14,7 @@
 					case "linkedin":
 					case "facebook":
 					case "hyves":
+					case "wordpress":
 					case "openbibid":
 						if(call_user_func("socialink_" . $page[1] . "_authorize")){
 							system_message(elgg_echo("socialink:authorize:success", array(elgg_echo("socialink:network:" . $page[1]))));
@@ -163,7 +164,37 @@
 									socialink_openbibid_update_connection($token, $user->getGUID());
 								} else {
 									$_SESSION["socialink_token"] = $token;
-									forward("pg/socialink/no_linked_account/openbibid");
+									forward("socialink/no_linked_account/openbibid");
+								}
+							} else {
+								register_error($error_msg_no_user);
+							}
+							break;
+						case "wordpress":
+							$token = socialink_wordpress_get_access_token(get_input("oauth_token"));
+							
+							if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
+								if($username = socialink_wordpress_get_username_from_token($token)){
+									$token["username"] = $username;
+									
+									$params = array(
+										"type" => "user",
+										"limit" => 1,
+										"site_guids" => false,
+										"plugin_id" => "socialink",
+										"plugin_user_setting_name_value_pairs" => array(
+											"wordpress_username" => $username
+										)
+									);
+									
+									if($users = elgg_get_entities_from_plugin_user_settings($params)){
+										$user = $users[0];
+										
+										socialink_wordpress_update_connection($token, $user->getGUID());
+									} else {
+										$_SESSION["socialink_token"] = $token;
+										forward("socialink/no_linked_account/wordpress");
+									}
 								}
 							} else {
 								register_error($error_msg_no_user);
@@ -171,8 +202,7 @@
 							break;
 					}
 					
-					if($user instanceof ElggUser){
-						
+					if(!empty($user) && elgg_instanceof($user, "user")){
 						try {
 							
 							// permanent login
@@ -215,9 +245,12 @@
 						case "twitter":
 						case "hyves":
 						case "openbibid":
-							set_input("network", $page[1]);
-							include(dirname(dirname(__FILE__)) . "/pages/no_linked_account.php");
+						case "wordpress":
+							$result = true;
 							
+							set_input("network", $page[1]);
+							
+							include(dirname(dirname(__FILE__)) . "/pages/no_linked_account.php");
 							break;
 					}
 				} else {
@@ -226,6 +259,8 @@
 				break;
 			case "share":
 				if(elgg_is_logged_in()){
+					$result = true;
+					
 					include(dirname(dirname(__FILE__)) . "/pages/share.php");
 				}
 				break;
@@ -260,6 +295,9 @@
 							case "openbibid":
 								$forward_url = socialink_openbibid_get_authorize_url($callback_url);
 								break;
+							case "wordpress":
+								$forward_url = socialink_wordpress_get_authorize_url($callback_url);
+								break;
 						}
 	
 						forward($forward_url);
@@ -267,4 +305,6 @@
 				}
 				break;
 		}
+		
+		return $result;
 	}

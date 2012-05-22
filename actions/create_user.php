@@ -1,5 +1,5 @@
 <?php 
-
+	
 	$forward_url = REFERER;
 	
 	if(!elgg_is_logged_in() && !empty($_SESSION["socialink_token"])){
@@ -24,6 +24,10 @@
 			case "hyves":
 				$token = unserialize($token);
 				$user = socialink_hyves_create_user($token, $email);
+				
+				break;
+			case "wordpress":
+				$user = socialink_wordpress_create_user($token, $email);
 				
 				break;
 			default:

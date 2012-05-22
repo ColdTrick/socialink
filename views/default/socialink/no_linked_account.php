@@ -12,7 +12,7 @@
 	}
 
 ?>
-<div><?php echo sprintf(elgg_echo("socialink:create_account:description"), $network_string); ?></div>
+<div><?php echo elgg_echo("socialink:create_account:description", array($network_string)); ?></div>
 <br />
 
 <div id="socialink_no_linked_account_container">

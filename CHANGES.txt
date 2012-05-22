@@ -1,6 +1,7 @@
 = Version history =
 x.x:
 
+- added: WordPress support
 - fixed: small bug in twitter library
 - changed: handling of plugin usersettings
 
