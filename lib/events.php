@@ -64,6 +64,9 @@
 					case "openbibid":
 						socialink_openbibid_authorize($entity->getGUID());
 						break;
+					case "wordpress":
+						socialink_wordpress_authorize($entity->getGUID());
+						break;
 				}
 	
 				$SESSION->offsetUnset("socialink_token");
