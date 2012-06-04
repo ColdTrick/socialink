@@ -235,6 +235,8 @@
 						
 					// restore hidden status
 					access_show_hidden_entities($access_status);
+				} else {
+					forward();
 				}
 				break;
 			case "no_linked_account":

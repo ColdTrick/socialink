@@ -4,6 +4,7 @@ x.x:
 - added: WordPress support
 - fixed: small bug in twitter library
 - fixed: walled garden support
+- fixed: potential 404 page while login
 - changed: handling of plugin usersettings
 
 1.1 (2012-03-02):
