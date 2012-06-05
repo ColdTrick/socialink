@@ -32,6 +32,7 @@
 		
 		// add socialink to the public pages
 		$result[] = "socialink/.*";
+		$result[] = "action/socialink/.*";
 		
 		return $result;
 	}
