@@ -37,6 +37,20 @@
 		// register page handler
 		elgg_register_page_handler("socialink", "socialink_page_handler");
 		
+		// register event handlers
+		//register_elgg_event_handler("create", "object", "socialink_create_object_handler");
+		elgg_register_event_handler("login", "user", "socialink_login_user_handler", 450);
+		
+		// hooks
+		elgg_register_plugin_hook_handler("socialink:sync", "user", "socialink_sync_network_hook");
+		elgg_register_plugin_hook_handler("public_pages", "walled_garden", "socialink_walled_garden_hook");
+		elgg_register_plugin_hook_handler("register", "user", "socialink_register_user_hook", 450);
+		
+		// register actions
+		elgg_register_action("socialink/remove", dirname(__FILE__) . "/actions/remove.php");
+		elgg_register_action("socialink/create_user", dirname(__FILE__) . "/actions/create_user.php", "public");
+		elgg_register_action("socialink/share", dirname(__FILE__) . "/actions/share.php");
+		
 		// load necesary files
 		socialink_load_networks();
 		
@@ -55,18 +69,4 @@
 	
 	// register default Elgg events
 	elgg_register_event_handler("init", "system", "socialink_init");
-	
-	// register event handlers
-	//register_elgg_event_handler("create", "object", "socialink_create_object_handler");
-	elgg_register_event_handler("validate", "user", "socialink_validate_user_handler", 450);
-	elgg_register_event_handler("login", "user", "socialink_login_user_handler", 450);
-	
-	// hooks
-	elgg_register_plugin_hook_handler("socialink:sync", "user", "socialink_sync_network_hook");
-	elgg_register_plugin_hook_handler("public_pages", "walled_garden", "socialink_walled_garden_hook");
-	
-	// register actions
-	elgg_register_action("socialink/remove", dirname(__FILE__) . "/actions/remove.php");
-	elgg_register_action("socialink/create_user", dirname(__FILE__) . "/actions/create_user.php", "public");
-	elgg_register_action("socialink/share", dirname(__FILE__) . "/actions/share.php");
 	

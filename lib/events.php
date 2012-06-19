@@ -23,23 +23,6 @@
 		}
 	}
 	
-	function socialink_validate_user_handler($event, $type, $entity){
-	
-		if(!empty($entity) && elgg_instanceof($entity, "user")){
-			$network = get_input("network");
-				
-			switch($network){
-				case "facebook":
-					// user is validated by facebook
-					elgg_set_user_validation_status($entity->getGUID(), true, "email");
-						
-					// break event chain
-					return false;
-					break;
-			}
-		}
-	}
-	
 	function socialink_login_user_handler($event, $type, $entity){
 		global $SESSION;
 	

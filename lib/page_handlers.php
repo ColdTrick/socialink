@@ -174,8 +174,7 @@
 							$token = socialink_wordpress_get_access_token(get_input("oauth_token"));
 							
 							if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
-								if($username = socialink_wordpress_get_username_from_token($token)){
-									$token["username"] = $username;
+								if($userdata = socialink_wordpress_get_user_data_from_token($token)){
 									
 									$params = array(
 										"type" => "user",
@@ -183,7 +182,7 @@
 										"site_guids" => false,
 										"plugin_id" => "socialink",
 										"plugin_user_setting_name_value_pairs" => array(
-											"wordpress_username" => $username
+											"wordpress_userid" => $userdata->ID
 										)
 									);
 									

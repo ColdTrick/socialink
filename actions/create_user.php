@@ -27,7 +27,7 @@
 				
 				break;
 			case "wordpress":
-				$user = socialink_wordpress_create_user($token, $email);
+				$user = socialink_wordpress_create_user($token);
 				
 				break;
 			default:

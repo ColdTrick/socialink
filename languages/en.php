@@ -207,7 +207,7 @@
 		'socialink:create_account:hyves:description' => "If you don't have an account you can create one by providing an e-mail address and clicking the Register button, we will then create an account based on you Hyves firstname and lastname and the provided e-mail address.",
 
 		// wordpress
-		'socialink:create_account:wordpress:description' => "If you don't have an account you can create one by providing an e-mail address and clicking the Register button, we will then create an account based on you WordPress username and the provided e-mail address.",
+		'socialink:create_account:wordpress:description' => "If you don't have an account you can create one by clicking on the Register button, we will then create an account based on you WordPress username and e-mail address.",
 		
 		//share
 		'socialink:share:facebook' => "Share on Facebook",

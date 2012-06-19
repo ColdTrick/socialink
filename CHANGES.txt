@@ -5,7 +5,9 @@ x.x:
 - fixed: small bug in twitter library
 - fixed: walled garden support
 - fixed: potential 404 page while login
+- fixed: facebook account not automaticly validated
 - changed: handling of plugin usersettings
+- changed: layout of start.php to be more inline with Elgg
 
 1.1 (2012-03-02):
 

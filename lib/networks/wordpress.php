@@ -117,7 +117,7 @@
 		if(!empty($user_guid) && ($token = socialink_wordpress_get_access_token($oauth_verifier))){
 			if (isset($token["oauth_token"]) && isset($token["oauth_token_secret"])) {
 				// get the WordPress username
-				if($username = socialink_wordpress_get_username_from_token($token)){
+				if($userdata = socialink_wordpress_get_user_data_from_token($token)){
 					// only one user per tokens
 					$params = array(
 						"type" => "user",
@@ -125,7 +125,7 @@
 						"site_guids" => false,
 						"plugin_id" => "socialink",
 						"plugin_user_setting_name_value_pairs" => array(
-							"wordpress_username" => $username
+							"wordpress_userid" => $userdata->ID
 						)
 					);
 						
@@ -136,7 +136,7 @@
 					if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
 						foreach ($users as $user) {
 							// revoke access
-							elgg_set_plugin_user_setting("wordpress_username", NULL, $user->getGUID(), "socialink");
+							elgg_set_plugin_user_setting("wordpress_userid", NULL, $user->getGUID(), "socialink");
 							elgg_set_plugin_user_setting("wordpress_oauth_token", NULL, $user->getGUID(), "socialink");
 							elgg_set_plugin_user_setting("wordpress_oauth_secret", NULL, $user->getGUID(), "socialink");
 						}
@@ -146,7 +146,7 @@
 					access_show_hidden_entities($access_status);
 						
 					// register user"s access tokens
-					elgg_set_plugin_user_setting("wordpress_username", $username, $user_guid, "socialink");
+					elgg_set_plugin_user_setting("wordpress_userid", $userdata->ID, $user_guid, "socialink");
 					elgg_set_plugin_user_setting("wordpress_oauth_token", $token["oauth_token"], $user_guid, "socialink");
 					elgg_set_plugin_user_setting("wordpress_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
 		
@@ -166,7 +166,6 @@
 		}
 		
 		if(!empty($token) && !empty($user_guid) && socialink_wordpress_is_connected($user_guid)){
-			elgg_set_plugin_user_setting("wordpress_username", $token["username"], $user_guid, "socialink");
 			elgg_set_plugin_user_setting("wordpress_oauth_token", $token["oauth_token"], $user_guid, "socialink");
 			elgg_set_plugin_user_setting("wordpress_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
 				
@@ -184,7 +183,7 @@
 		}
 	
 		if(!empty($user_guid) && socialink_wordpress_is_connected($user_guid)){
-			elgg_set_plugin_user_setting("wordpress_username", null, $user_guid, "socialink");
+			elgg_set_plugin_user_setting("wordpress_userid", null, $user_guid, "socialink");
 			elgg_set_plugin_user_setting("wordpress_oauth_token", null, $user_guid, "socialink");
 			elgg_set_plugin_user_setting("wordpress_oauth_secret", null, $user_guid, "socialink");
 			
@@ -194,114 +193,99 @@
 		return $result;
 	}
 	
-	function socialink_wordpress_say_hello($user_guid = 0){
-		$result = false;
-		
-		if(!empty($user_guid)){
-			$user_guid = elgg_get_logged_in_user_guid();
-		}
-		
-		if(!empty($user_guid) && ($keys = socialink_wordpress_is_connected($user_guid))){
-			if($api = socialink_wordpress_get_api_object($keys)){
-				$url = "oauth/sayHello";
-				
-				if(($response = $api->get($url)) && socialink_wordpress_validate_response($response)){
-					$result = $response->message;
-				}
-			}
-		}
-		
-		return $result;
-	}
-	
-	function socialink_wordpress_get_username($user_guid = 0){
-		$result = false;
-		
-		if(!empty($user_guid)){
-			$user_guid = elgg_get_logged_in_user_guid();
-		}
-		
-		if($hello = socialink_wordpress_say_hello($user_guid)){
-			$result = str_replace("Hello ", "", str_replace("!", "", $hello));
-		}
-		
-		return $result;
-	}
-	
-	function socialink_wordpress_get_username_from_token($token){
+	function socialink_wordpress_get_user_data_from_token($token){
 		$result = false;
 		
 		if(!empty($token) && is_array($token)){
 			if($keys = socialink_wordpress_available()){
-				$keys["oauth_token"] = $token["oauth_token"];
-				$keys["oauth_secret"] = $token["oauth_token_secret"];
+				$keys["oauth_token"] = elgg_extract("oauth_token", $token);
+				$keys["oauth_secret"] = elgg_extract("oauth_token_secret", $token, elgg_extract("oauth_secret", $token));
 				
 				if($api = socialink_wordpress_get_api_object($keys)){
-					$url = "oauth/sayHello";
+					$url = "oauth/userData";
 					
 					if(($response = $api->get($url)) && socialink_wordpress_validate_response($response)){
-						$string = $response->message;
-						
-						$result = str_replace("Hello ", "", str_replace("!", "", $string));
+						$result = $response;
 					}
-				}
+				}	
 			}
 		}
 		
 		return $result;
 	}
 	
-	function socialink_wordpress_create_user($token, $email){
+	function socialink_wordpress_get_user_data($user_guid = 0){
 		$result = false;
 		
-		if(!empty($token) && is_array($token) && !empty($email)){
-			if(!get_user_by_email($email) && is_email_address($email)){
-				$username = elgg_extract("username", $token);
-				$name = $username;
+		if(empty($user_guid)){
+			$user_guid = elgg_get_logged_in_user_guid();
+		}
+		
+		if(!empty($user_guid)){
+			if($keys = socialink_wordpress_is_connected($user_guid)){
 				
-				// show hidden entities
-				$access = access_get_show_hidden_status();
-				access_show_hidden_entities(TRUE);
+				$result = socialink_wordpress_get_user_data_from_token($keys);
+			}
+		}
+		
+		return $result;
+	}
+	
+	function socialink_wordpress_create_user($token){
+		$result = false;
+		
+		if(!empty($token) && is_array($token)){
+			if($userdata = socialink_wordpress_get_user_data_from_token($token)){
+				$email = $userdata->email;
 				
-				// check if the WordPress username is available on Elgg
-				if(get_user_by_username($username)){
-					// make a new username based on the email address
-					$username = socialink_create_username_from_email($email);
-				}
-				
-				$pwd = generate_random_cleartext_password();
-				
-				try {
-					if($user_guid = register_user($username, $pwd, $name, $email)){
-						
-						if($user = get_user($user_guid)){
-							// save user tokens
-							elgg_set_plugin_user_setting("wordpress_username", $token["username"], $user_guid, "socialink");
-							elgg_set_plugin_user_setting("wordpress_oauth_token", $token["oauth_token"], $user_guid, "socialink");
-							elgg_set_plugin_user_setting("wordpress_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
-								
-							// trigger hook for registration
-							$params = array(
-								"user" => $user,
-								"password" => $pwd,
-								"friend_guid" => 0,
-								"invitecode" => ""
-							);
-								
-							if(elgg_trigger_plugin_hook("register", "user", $params, true) !== false){
-								// return the user
-								$result = $user;
+				if(!get_user_by_email($email) && is_email_address($email)){
+					$username = $userdata->username;
+					$displayname = $userdata->displayname;
+					
+					// show hidden entities
+					$access = access_get_show_hidden_status();
+					access_show_hidden_entities(true);
+					
+					// check if the WordPress username is available on Elgg
+					if(get_user_by_username($username)){
+						// make a new username based on the email address
+						$username = socialink_create_username_from_email($email);
+					}
+					
+					$pwd = generate_random_cleartext_password();
+					
+					try {
+						if($user_guid = register_user($username, $pwd, $displayname, $email)){
+							
+							if($user = get_user($user_guid)){
+								// save user tokens
+								elgg_set_plugin_user_setting("wordpress_userid", $userdata->ID, $user_guid, "socialink");
+								elgg_set_plugin_user_setting("wordpress_oauth_token", $token["oauth_token"], $user_guid, "socialink");
+								elgg_set_plugin_user_setting("wordpress_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
+									
+								// trigger hook for registration
+								$params = array(
+									"user" => $user,
+									"password" => $pwd,
+									"friend_guid" => 0,
+									"invitecode" => ""
+								);
+									
+								if(elgg_trigger_plugin_hook("register", "user", $params, true) !== false){
+									// return the user
+									$result = $user;
+								}
 							}
 						}
+					} catch(Exception $e){
+						echo $e->getMessage();
 					}
-				} catch(Exception $e){
-					echo $e->getMessage();
+					
+					// restore hidden entities
+					access_show_hidden_entities($access);
+				} else {
+					register_error(elgg_echo("socialink:networks:create_user:error:email"));
 				}
-				
-				// restore hidden entities
-				access_show_hidden_entities($access);
-			} else {
-				register_error(elgg_echo("socialink:networks:create_user:error:email"));
 			}
 		}
 		

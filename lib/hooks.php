@@ -36,3 +36,26 @@
 		
 		return $result;
 	}
+	
+	function socialink_register_user_hook($hook, $type, $return_value, $params){
+		$result = $return_value;
+		
+		if(!empty($params) && is_array($params)){
+			$user = elgg_extract("user", $params);
+			
+			if(elgg_instanceof($user, "user")){
+				$network = get_input("network");
+				
+				switch($network){
+					case "facebook":
+					case "wordpress":
+						// user is validated by facebook or wordpress
+						elgg_set_user_validation_status($user->getGUID(), true, "email");
+				
+						break;
+				}
+			}
+		}
+		
+		return $result;
+	}
