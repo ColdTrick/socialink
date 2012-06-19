@@ -102,8 +102,8 @@
 						curl_close($ch);
 						
 						if(!empty($response)){
-							list($dummy, $token) = explode("=", $response);
-							
+							list($token, $dummy) = preg_split('/access_token=([a-zA-Z0-9]+)/', $response, 2,  PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
 							if(!empty($token)){
 								$result = $token;
 							}
