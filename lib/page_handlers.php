@@ -36,207 +36,210 @@
 					$network_name = elgg_echo("socialink:network:" . $network);
 						
 					$error_msg_no_user = elgg_echo("socialink:login:error:no_user", array($network_name, $network_name));
-						
-					// find hidden users (just created)
-					$access_status = access_get_show_hidden_status();
-					access_show_hidden_entities(true);
+
+					if(socialink_is_available_network($network)){
 					
-					switch($network){
-						case "twitter":
-							$token = socialink_twitter_get_access_token(get_input("oauth_verifier"));
-							
-							if (isset($token["oauth_token"]) && isset($token["oauth_token_secret"])) {
-								$params = array(
-									"type" => "user",
-									"limit" => 1,
-									"site_guids" => false,
-									"plugin_id" => "socialink",
-									"plugin_user_setting_name_value_pairs" => array(
-										"twitter_oauth_token" => $token["oauth_token"],
-										"twitter_oauth_secret" => $token["oauth_token_secret"]
-									)
-								);
-								
-								
-								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-									$user = $users[0];
-								} else {
-									$_SESSION["socialink_token"] = $token;
-									forward("socialink/no_linked_account/twitter");
-								}
-							} else {
-								register_error($error_msg_no_user);
-							}
-							break;
-						case "linkedin":
-							$token = socialink_linkedin_get_access_token(get_input("oauth_verifier"));
-								
-							if (isset($token["oauth_token"]) && isset($token["oauth_token_secret"])) {
-								$params = array(
-									"type" => "user",
-									"limit" => 1,
-									"site_guids" => false,
-									"plugin_id" => "socialink",
-									"plugin_user_setting_name_value_pairs" => array(
-										"linkedin_oauth_token" => $token["oauth_token"],
-										"linkedin_oauth_secret" => $token["oauth_token_secret"]
-									)
-								);
-								
-								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-									$user = $users[0];
-								} else {
-									$_SESSION["socialink_token"] = $token;
-									forward("socialink/no_linked_account/linkedin");
-								}
-							} else {
-								register_error($error_msg_no_user);
-							}
-							break;
-						case "facebook":
-							$state = get_input("state", NULL);
-								
-							if($token = socialink_facebook_get_access_token($state)){
-								$params = array(
-									"type" => "user",
-									"limit" => 1,
-									"site_guids" => false,
-									"plugin_id" => "socialink",
-									"plugin_user_setting_name_value_pairs" =>  array(
-										"facebook_access_token" => $token
-									)
-								);
-								
-								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-									$user = $users[0];
-								} else {
-									$_SESSION["socialink_token"] = $token;
-									forward("socialink/no_linked_account/facebook");
-								}
-							} else {
-								register_error($error_msg_no_user);
-							}
-							break;
-						case "hyves":
-							
-							$token = socialink_hyves_get_access_token(get_input("oauth_verifier"));
-							
-							if(is_object($token) && $token->getKey() && $token->getSecret()){
-								$params = array(
-									"type" => "user",
-									"limit" => 1,
-									"site_guids" => false,
-									"plugin_id" => "socialink",
-									"plugin_user_setting_name_value_pairs" => array(
-										"hyves_oauth_token" => $token->getKey(),
-										"hyves_oauth_secret" => $token->getSecret()
-									)
-								);
-								
-								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-									$user = $users[0];
-								} else {
-									$_SESSION["socialink_token"] = serialize($token);
-									forward("socialink/no_linked_account/hyves");
-								}
-							} else {
-								register_error($error_msg_no_user);
-							}
-							
-							break;
-						case "openbibid":
-							$token = socialink_openbibid_get_access_token(get_input('oauth_verifier'));
+						// find hidden users (just created)
+						$access_status = access_get_show_hidden_status();
+						access_show_hidden_entities(true);
 						
-							if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
-								$params = array(
-									"type" => "user",
-									"limit" => 1,
-									"site_guids" => false,
-									"plugin_id" => "socialink",
-									"plugin_user_setting_name_value_pairs" => array(
-										"openbibid_user_id" => $token['userId']
-									)
-								);
+						switch($network){
+							case "twitter":
+								$token = socialink_twitter_get_access_token(get_input("oauth_verifier"));
 								
-								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-									$user = $users[0];
-										
-									socialink_openbibid_update_connection($token, $user->getGUID());
-								} else {
-									$_SESSION["socialink_token"] = $token;
-									forward("socialink/no_linked_account/openbibid");
-								}
-							} else {
-								register_error($error_msg_no_user);
-							}
-							break;
-						case "wordpress":
-							$token = socialink_wordpress_get_access_token(get_input("oauth_token"));
-							
-							if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
-								if($userdata = socialink_wordpress_get_user_data_from_token($token)){
-									
+								if (isset($token["oauth_token"]) && isset($token["oauth_token_secret"])) {
 									$params = array(
 										"type" => "user",
 										"limit" => 1,
 										"site_guids" => false,
 										"plugin_id" => "socialink",
 										"plugin_user_setting_name_value_pairs" => array(
-											"wordpress_userid" => $userdata->ID
+											"twitter_oauth_token" => $token["oauth_token"],
+											"twitter_oauth_secret" => $token["oauth_token_secret"]
 										)
 									);
 									
-									if($users = elgg_get_entities_from_plugin_user_settings($params)){
+									
+									if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
 										$user = $users[0];
-										
-										socialink_wordpress_update_connection($token, $user->getGUID());
 									} else {
 										$_SESSION["socialink_token"] = $token;
-										forward("socialink/no_linked_account/wordpress");
+										forward("socialink/no_linked_account/twitter");
 									}
+								} else {
+									register_error($error_msg_no_user);
 								}
-							} else {
-								register_error($error_msg_no_user);
-							}
-							break;
-					}
-					
-					if(!empty($user) && elgg_instanceof($user, "user")){
-						try {
+								break;
+							case "linkedin":
+								$token = socialink_linkedin_get_access_token(get_input("oauth_verifier"));
+									
+								if (isset($token["oauth_token"]) && isset($token["oauth_token_secret"])) {
+									$params = array(
+										"type" => "user",
+										"limit" => 1,
+										"site_guids" => false,
+										"plugin_id" => "socialink",
+										"plugin_user_setting_name_value_pairs" => array(
+											"linkedin_oauth_token" => $token["oauth_token"],
+											"linkedin_oauth_secret" => $token["oauth_token_secret"]
+										)
+									);
+									
+									if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
+										$user = $users[0];
+									} else {
+										$_SESSION["socialink_token"] = $token;
+										forward("socialink/no_linked_account/linkedin");
+									}
+								} else {
+									register_error($error_msg_no_user);
+								}
+								break;
+							case "facebook":
+								$state = get_input("state", NULL);
+									
+								if($token = socialink_facebook_get_access_token($state)){
+									$params = array(
+										"type" => "user",
+										"limit" => 1,
+										"site_guids" => false,
+										"plugin_id" => "socialink",
+										"plugin_user_setting_name_value_pairs" =>  array(
+											"facebook_access_token" => $token
+										)
+									);
+									
+									if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
+										$user = $users[0];
+									} else {
+										$_SESSION["socialink_token"] = $token;
+										forward("socialink/no_linked_account/facebook");
+									}
+								} else {
+									register_error($error_msg_no_user);
+								}
+								break;
+							case "hyves":
+								
+								$token = socialink_hyves_get_access_token(get_input("oauth_verifier"));
+								
+								if(is_object($token) && $token->getKey() && $token->getSecret()){
+									$params = array(
+										"type" => "user",
+										"limit" => 1,
+										"site_guids" => false,
+										"plugin_id" => "socialink",
+										"plugin_user_setting_name_value_pairs" => array(
+											"hyves_oauth_token" => $token->getKey(),
+											"hyves_oauth_secret" => $token->getSecret()
+										)
+									);
+									
+									if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
+										$user = $users[0];
+									} else {
+										$_SESSION["socialink_token"] = serialize($token);
+										forward("socialink/no_linked_account/hyves");
+									}
+								} else {
+									register_error($error_msg_no_user);
+								}
+								
+								break;
+							case "openbibid":
+								$token = socialink_openbibid_get_access_token(get_input('oauth_verifier'));
 							
-							// permanent login
-							login($user, true);
-							
-							// log last network
-							elgg_set_plugin_user_setting("last_login_network", $network, $user->getGUID(), "socialink");
-
-							// sync network data
-							elgg_trigger_plugin_hook("socialink:sync", "user", array("user" => $user, "network" => $network));
-
-							// set message and forward to correct page
-							system_message(elgg_echo("loginok"));
-
-							if (isset($_SESSION["last_forward_from"]) && $_SESSION["last_forward_from"]) {
-								$forward_url = $_SESSION["last_forward_from"];
-								unset($_SESSION["last_forward_from"]);
-								forward($forward_url);
-							} elseif (get_input("returntoreferer")) {
-								forward(REFERER);
-							} else {
+								if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
+									$params = array(
+										"type" => "user",
+										"limit" => 1,
+										"site_guids" => false,
+										"plugin_id" => "socialink",
+										"plugin_user_setting_name_value_pairs" => array(
+											"openbibid_user_id" => $token['userId']
+										)
+									);
+									
+									if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
+										$user = $users[0];
+											
+										socialink_openbibid_update_connection($token, $user->getGUID());
+									} else {
+										$_SESSION["socialink_token"] = $token;
+										forward("socialink/no_linked_account/openbibid");
+									}
+								} else {
+									register_error($error_msg_no_user);
+								}
+								break;
+							case "wordpress":
+								$token = socialink_wordpress_get_access_token(get_input("oauth_token"));
+								
+								if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
+									if($userdata = socialink_wordpress_get_user_data_from_token($token)){
+										
+										$params = array(
+											"type" => "user",
+											"limit" => 1,
+											"site_guids" => false,
+											"plugin_id" => "socialink",
+											"plugin_user_setting_name_value_pairs" => array(
+												"wordpress_userid" => $userdata->ID
+											)
+										);
+										
+										if($users = elgg_get_entities_from_plugin_user_settings($params)){
+											$user = $users[0];
+											
+											socialink_wordpress_update_connection($token, $user->getGUID());
+										} else {
+											$_SESSION["socialink_token"] = $token;
+											forward("socialink/no_linked_account/wordpress");
+										}
+									}
+								} else {
+									register_error($error_msg_no_user);
+								}
+								break;
+						}
+						
+						if(!empty($user) && elgg_instanceof($user, "user")){
+							try {
+								
+								// permanent login
+								login($user, true);
+								
+								// log last network
+								elgg_set_plugin_user_setting("last_login_network", $network, $user->getGUID(), "socialink");
+	
+								// sync network data
+								elgg_trigger_plugin_hook("socialink:sync", "user", array("user" => $user, "network" => $network));
+	
+								// set message and forward to correct page
+								system_message(elgg_echo("loginok"));
+	
+								if (isset($_SESSION["last_forward_from"]) && $_SESSION["last_forward_from"]) {
+									$forward_url = $_SESSION["last_forward_from"];
+									unset($_SESSION["last_forward_from"]);
+									forward($forward_url);
+								} elseif (get_input("returntoreferer")) {
+									forward(REFERER);
+								} else {
+									forward();
+								}
+							} catch (LoginException $e) {
+								// validation mechanisme should report that you are not authenticated. Currently uservalidation by email doesn't do that
+								//register_error($e->getMessage());
 								forward();
 							}
-						} catch (LoginException $e) {
-							// validation mechanisme should report that you are not authenticated. Currently uservalidation by email doesn't do that
-							//register_error($e->getMessage());
-							forward();
 						}
-					}
-						
-					// restore hidden status
-					access_show_hidden_entities($access_status);
-				} else {
-					forward();
+							
+						// restore hidden status
+						access_show_hidden_entities($access_status);
+					} 
 				}
+				
+				forward();
 				break;
 			case "no_linked_account":
 				if(!elgg_is_logged_in()){
