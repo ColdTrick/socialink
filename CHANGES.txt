@@ -7,6 +7,7 @@ x.x:
 - fixed: potential 404 page while login
 - fixed: facebook account not automaticly validated
 - fixed: invalid forward on failed loggin
+- fixed: auto generation of username now always makes valid usernames
 - changed: handling of plugin usersettings
 - changed: layout of start.php to be more inline with Elgg
 
