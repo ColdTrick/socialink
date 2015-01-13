@@ -1,6 +1,4 @@
-<?php
-
-?>
+<?php ?>
 #socialink_settings_accordion div.elgg-head.ui-state-hover {
 	cursor: pointer;
 }

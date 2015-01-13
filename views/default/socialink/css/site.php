@@ -1,6 +1,4 @@
-<?php 
-
-?>
+<?php ?>
 #socialink_usersettings_twitter_icon {
 	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/twitter/logo_withbird_90x17_allblue.png") transparent top left no-repeat;
 	width: 90px;
@@ -52,7 +50,7 @@
 	margin-left: 150px;
 	padding-bottom: 5px;
 	border-bottom: 1px dotted #CECECE;
-	margin-bottom: 5px;	
+	margin-bottom: 5px;
 }
 
 #socialink_twitter_sync_configure,
