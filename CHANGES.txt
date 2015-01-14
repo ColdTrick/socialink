@@ -1,4 +1,9 @@
 = Version history =
+
+1.2.1 (2015-01-14):
+
+- applied Elgg coding standards
+
 1.2 (2013-04-05):
 
 - added: WordPress support
