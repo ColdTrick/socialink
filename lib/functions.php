@@ -101,52 +101,6 @@ function socialink_linkedin_available() {
 }
 
 /**
- * Check if the Hyves link is available
- *
- * @return bool|array
- */
-function socialink_hyves_available() {
-	$result = false;
-	
-	if (elgg_get_plugin_setting("enable_hyves", "socialink") == "yes") {
-		$consumer_key = elgg_get_plugin_setting("hyves_consumer_key", "socialink");
-		$consumer_secret = elgg_get_plugin_setting("hyves_consumer_secret", "socialink");
-		
-		if (!empty($consumer_key) && !empty($consumer_secret)) {
-			$result = array(
-				"consumer_key" => $consumer_key,
-				"consumer_secret" => $consumer_secret,
-			);
-		}
-	}
-	
-	return $result;
-}
-
-/**
- * Check if the OpenBibId link is available
- *
- * @return bool|array
- */
-function socialink_openbibid_available() {
-	$result = false;
-
-	if (elgg_get_plugin_setting("enable_openbibid", "socialink") == "yes") {
-		$consumer_key = elgg_get_plugin_setting("openbibid_consumer_key", "socialink");
-		$consumer_secret = elgg_get_plugin_setting("openbibid_consumer_secret", "socialink");
-			
-		if (!empty($consumer_key) && !empty($consumer_secret)) {
-			$result = array(
-				"consumer_key" => $consumer_key,
-				"consumer_secret" => $consumer_secret,
-			);
-		}
-	}
-
-	return $result;
-}
-
-/**
  * Check if the Wordpress link is available
  *
  * @return bool|array
@@ -177,7 +131,7 @@ function socialink_wordpress_available() {
  * @return array
  */
 function socialink_get_supported_networks() {
-	return array("twitter", "linkedin", "facebook", "hyves", "openbibid", "wordpress");
+	return array("twitter", "linkedin", "facebook", "wordpress");
 }
 
 /**
@@ -347,16 +301,6 @@ function socialink_get_network_fields($network) {
 				"about" => "about",
 				"bio" => "bio",
 				"hometown" => "hometown"
-			),
-			"hyves" => array(
-				"name" => "displayname",
-				"firstname" => "firstname",
-				"lastname" => "lastname",
-				"profile_url" => "url",
-				"gender" => "gender",
-				"city" => "cityname",
-				"country" => "countryname",
-				"about" => "aboutme"
 			)
 		);
 		

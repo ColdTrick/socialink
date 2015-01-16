@@ -62,12 +62,6 @@ function socialink_login_user_handler($event, $type, $entity) {
 				case "linkedin":
 					socialink_linkedin_authorize($entity->getGUID());
 					break;
-				case "hyves":
-					socialink_hyves_authorize($entity->getGUID());
-					break;
-				case "openbibid":
-					socialink_openbibid_authorize($entity->getGUID());
-					break;
 				case "wordpress":
 					socialink_wordpress_authorize($entity->getGUID());
 					break;

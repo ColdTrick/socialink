@@ -23,9 +23,7 @@ function socialink_page_handler($page) {
 				case "twitter":
 				case "linkedin":
 				case "facebook":
-				case "hyves":
 				case "wordpress":
-				case "openbibid":
 					if (call_user_func("socialink_" . $page[1] . "_authorize")) {
 						system_message(elgg_echo("socialink:authorize:success", array(elgg_echo("socialink:network:" . $page[1]))));
 					} else {
@@ -129,59 +127,6 @@ function socialink_page_handler($page) {
 								register_error($error_msg_no_user);
 							}
 							break;
-						case "hyves":
-							
-							$token = socialink_hyves_get_access_token(get_input("oauth_verifier"));
-							
-							if (is_object($token) && $token->getKey() && $token->getSecret()) {
-								$params = array(
-									"type" => "user",
-									"limit" => 1,
-									"site_guids" => false,
-									"plugin_id" => "socialink",
-									"plugin_user_setting_name_value_pairs" => array(
-										"hyves_oauth_token" => $token->getKey(),
-										"hyves_oauth_secret" => $token->getSecret()
-									)
-								);
-								
-								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-									$user = $users[0];
-								} else {
-									$_SESSION["socialink_token"] = serialize($token);
-									forward("socialink/no_linked_account/hyves");
-								}
-							} else {
-								register_error($error_msg_no_user);
-							}
-							
-							break;
-						case "openbibid":
-							$token = socialink_openbibid_get_access_token(get_input('oauth_verifier'));
-						
-							if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
-								$params = array(
-									"type" => "user",
-									"limit" => 1,
-									"site_guids" => false,
-									"plugin_id" => "socialink",
-									"plugin_user_setting_name_value_pairs" => array(
-										"openbibid_user_id" => $token['userId']
-									)
-								);
-								
-								if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-									$user = $users[0];
-										
-									socialink_openbibid_update_connection($token, $user->getGUID());
-								} else {
-									$_SESSION["socialink_token"] = $token;
-									forward("socialink/no_linked_account/openbibid");
-								}
-							} else {
-								register_error($error_msg_no_user);
-							}
-							break;
 						case "wordpress":
 							$token = socialink_wordpress_get_access_token(get_input("oauth_token"));
 							
@@ -257,8 +202,6 @@ function socialink_page_handler($page) {
 					case "linkedin":
 					case "facebook":
 					case "twitter":
-					case "hyves":
-					case "openbibid":
 					case "wordpress":
 						$result = true;
 						
@@ -302,12 +245,6 @@ function socialink_page_handler($page) {
 							break;
 						case "twitter":
 							$forward_url = socialink_twitter_get_authorize_url($callback_url);
-							break;
-						case "hyves":
-							$forward_url = socialink_hyves_get_authorize_url($callback_url);
-							break;
-						case "openbibid":
-							$forward_url = socialink_openbibid_get_authorize_url($callback_url);
 							break;
 						case "wordpress":
 							$forward_url = socialink_wordpress_get_authorize_url($callback_url);

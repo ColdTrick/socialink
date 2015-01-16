@@ -1,4 +1,12 @@
-= Version history =
+Version history
+===============
+
+2.0:
+
+- changed: LinkedIn library to https://github.com/ashwinks/PHP-LinkedIn-SDK
+- changed: updated Facebook PHP SDK to version 4.0
+- removed: support for OpenBibID
+- removed: support for Hyves
 
 1.2.1 (2015-01-14):
 

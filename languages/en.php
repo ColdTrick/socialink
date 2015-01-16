@@ -1,6 +1,6 @@
 <?php
 
-$english = array(
+return array(
 	'socialink' => "SociaLink - Link your social networks",
 
 	'socialink:profile:details' => "%s Profile Details",
@@ -15,10 +15,8 @@ $english = array(
 	'socialink:network:twitter' => "Twitter",
 	'socialink:network:linkedin' => "LinkedIn",
 	'socialink:network:facebook' => "Facebook",
-	'socialink:network:hyves' => "Hyves",
 	'socialink:network:wordpress' => "WordPress",
-	'socialink:network:openbibid' => "OpenBibID",
-
+	
 	// profile fields
 	'profile:twitter_name' => "Name",
 	'profile:twitter_profile_url' => "Profile",
@@ -63,15 +61,6 @@ $english = array(
 	'socialink:facebook:field:bio' => "Bio",
 	'socialink:facebook:field:hometown' => "Hometown",
 	
-	'socialink:hyves:field:name' => "Name",
-	'socialink:hyves:field:firstname' => "Firstname",
-	'socialink:hyves:field:lastname' => "Lastname",
-	'socialink:hyves:field:profile_url' => "Profile URL",
-	'socialink:hyves:field:gender' => "Gender",
-	'socialink:hyves:field:city' => "City",
-	'socialink:hyves:field:country' => "Country",
-	'socialink:hyves:field:about' => "About me",
-	
 	// views
 	// admin settings
 	'socialink:settings:in_options:fifteenmin' => "Yes, every fifteen minutes",
@@ -80,9 +69,7 @@ $english = array(
 	'socialink:settings:enable:twitter' => "Enable Twitter support",
 	'socialink:settings:enable:facebook' => "Enable Facebook support",
 	'socialink:settings:enable:linkedin' => "Enable LinkedIn support",
-	'socialink:settings:enable:hyves' => "Enable Hyves support",
 	'socialink:settings:enable:wordpress' => "Enable WordPress support",
-	'socialink:settings:enable:openbibid' => "Enable OpenBibID support",
 	
 	'socialink:settings:proxy:host' => "Proxy host",
 	'socialink:settings:proxy:port' => "Proxy port",
@@ -116,14 +103,6 @@ $english = array(
 	'socialink:settings:linkedin:sync_profile_fields' => "Sync LinkedIn fields to profile",
 	'socialink:settings:linkedin:linkedin_field' => "LinkedIn field",
 	
-	'socialink:settings:hyves:header' => "Hyves settings",
-	'socialink:settings:hyves:api:consumer_key' => "API key",
-	'socialink:settings:hyves:api:consumer_secret' => "API secret",
-	'socialink:settings:hyves:allow_login' => "Allow login by Hyves",
-	'socialink:settings:hyves:allow_create' => "Allow account creation by Hyves",
-	'socialink:settings:hyves:sync_profile_fields' => "Sync Hyves fields to profile",
-	'socialink:settings:hyves:hyves_field' => "Hyves field",
-	
 	'socialink:settings:wordpress:header' => "WordPress settings",
 	'socialink:settings:wordpress:api:description' => "In order to connect your WordPress installation and this Elgg installation you need the <a href='%s' target='_blank'>OAuth Provider</a> plugin",
 	'socialink:settings:wordpress:api:url' => "The URL to your WordPress installation",
@@ -133,14 +112,6 @@ $english = array(
 	'socialink:settings:wordpress:allow_login' => "Allow login by WordPress",
 	'socialink:settings:wordpress:allow_create' => "Allow account creation by WordPress",
 	
-	'socialink:settings:openbibid:header' => "OpenBibID settings",
-	'socialink:settings:openbibid:api:consumer_key' => "API key",
-	'socialink:settings:openbibid:api:consumer_secret' => "API secret",
-	'socialink:settings:openbibid:allow_login' => "Allow login by OpenBibID",
-	'socialink:settings:openbibid:allow_create' => "Allow account creation by OpenBibID",
-	'socialink:settings:openbibid:sync_profile_fields' => "Sync OpenBibID fields to profile",
-	'socialink:settings:openbibid:linkedin_field' => "OpenBibID field",
-
 	// user settings
 	'socialink:usersettings:no_access' => "The usersettings for this plugin can only be managed by the owning user, not by an administrator",
 	
@@ -161,20 +132,13 @@ $english = array(
 	'socialink:usersettings:linkedin:not_connected' => "Your account is not yet connected to your LinkedIn account. To link your accounts please click on %sthis link%s.",
 	'socialink:usersettings:linkedin:remove' => "Your account is linked to your LinkedIn account. %sRevoke Access%s",
 	
-	'socialink:usersettings:hyves:not_connected' => "Your account is not yet connected to your Hyves account. To link your accounts please click on %sthis link%s.",
-	'socialink:usersettings:hyves:remove' => "Your account is linked to your Hyves account. %sRevoke Access%s",
-	
 	'socialink:usersettings:wordpress:not_connected' => "Your account is not yet connected to your WordPress account. To link your accounts please click on %sthis link%s.",
 	'socialink:usersettings:wordpress:remove' => "Your account is linked to your WordPress account. %sRevoke Access%s",
-	
-	'socialink:usersettings:openbibid:not_connected' => "Your account is not yet connected to you OpenBibId account. To link your accounts please click on %sthis link%s.",
-	'socialink:usersettings:openbibid:remove' => "Your account is linked to your OpenBibId account. %sRevoke Access%s",
 	
 	'socialink:usersettings:twitter:thewire' => "Post your Wire messages to Twitter",
 	'socialink:usersettings:facebook:thewire' => "Post your Wire messages to Facebook",
 	'socialink:usersettings:linkedin:thewire' => "Post your Wire messages to LinkedIn",
-	'socialink:usersettings:hyves:thewire' => "Post your Wire messages to Hyves",
-
+	
 	// authorize
 	'socialink:authorize:failed' => "An error occured while authorizing you with your %s account",
 	'socialink:authorize:success' => "Your %s account was successfully linked",
@@ -203,9 +167,6 @@ $english = array(
 	// facebook
 	'socialink:create_account:facebook:description' => "If you don't have an account you can create one by clicking on the Register button, we will then create an account based on your Facebook name and e-mail address.",
 	
-	// hyves
-	'socialink:create_account:hyves:description' => "If you don't have an account you can create one by providing an e-mail address and clicking the Register button, we will then create an account based on you Hyves firstname and lastname and the provided e-mail address.",
-
 	// wordpress
 	'socialink:create_account:wordpress:description' => "If you don't have an account you can create one by clicking on the Register button, we will then create an account based on you WordPress username and e-mail address.",
 	
@@ -213,7 +174,6 @@ $english = array(
 	'socialink:share:facebook' => "Share on Facebook",
 	'socialink:share:twitter' => "Post on Twitter",
 	'socialink:share:linkedin' => "Share on LinkedIn",
-	'socialink:share:hyves' => "Share on Hyves",
 	'socialink:share:too_long' => "Your message contains too much characters",
 
 	// link account
@@ -233,5 +193,3 @@ $english = array(
 	'socialink:actions:create_user:error:network' => "The supplied network is not supported",
 	
 );
-
-add_translation("en", $english);

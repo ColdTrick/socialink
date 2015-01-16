@@ -14,9 +14,9 @@ Contents
 1. Features
 -----------
 
-- Connect to Facebook, LinkedIn, Twitter, Hyves, OpenBibID and WordPress
+- Connect to Facebook, LinkedIn, Twitter and WordPress
 - Login (for registrered users) with social network account
-- Create an account based on Facebook, LinkedIn, Twitter, Hyves, OpenBibID and WordPress (admin option)
+- Create an account based on Facebook, LinkedIn, Twitter and WordPress (admin option)
 - Link profile data to Elgg profile
 
 2. External libaries
@@ -30,22 +30,12 @@ Contents
 ### Facebook PHP SDK
 
 - by Facebook
-- URL: https://github.com/facebook/php-sdk
+- URL: https://github.com/facebook/facebook-php-sdk-v4
 
-### Simple LinkedIn
+### LinkedIn
 
-- by Paul Mennega
-- URL: http://code.google.com/p/simple-linkedinphp/
-
-### OAuth PHP
-
-- URL: http://code.google.com/p/oauth/
-
-### GenusApis (for Hyves)
-
-- URL: http://code.google.com/p/genusapis/
-
-Please note that many changes have been made to this API to prevent conflicts with OAuth API
+- by Ashwin Surajbali
+- URL: https://github.com/ashwinks/PHP-LinkedIn-SDK
 
 3. ToDo
 -------
