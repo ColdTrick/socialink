@@ -1,6 +1,9 @@
 SociaLink
 =========
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ColdTrick/socialink/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ColdTrick/socialink/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/ColdTrick/socialink/badges/build.png?b=master)](https://scrutinizer-ci.com/g/ColdTrick/socialink/build-status/master)
+
 Log in to your Elgg social network using LinkedIn, Twitter and/or Facebook
 
 Contents

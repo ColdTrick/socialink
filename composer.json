@@ -13,11 +13,12 @@
 		"classmap": ["classes/"]
 	},
 	"require": {
+		"php": ">=5.4.0",
+		"ext-json": "*",
+		"lib-curl": "*",
 		"facebook/php-sdk-v4": "4.0.*",
 		"abraham/twitteroauth": "0.3.*",
 		"linkedinapi/linkedin": "^1.1.0",
-		"composer/installers": ">=1.0.8",
-		"ext-curl": "*",
-		"ext-json": "*"
+		"composer/installers": ">=1.0.8"
 	}
 }
