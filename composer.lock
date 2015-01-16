@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7e1196170be974ed82f0edf2833e2595",
+    "hash": "04ebf4f4293dd9de250062dd56639bb3",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -203,16 +203,16 @@
         },
         {
             "name": "linkedinapi/linkedin",
-            "version": "1.1.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ashwinks/PHP-LinkedIn-SDK.git",
-                "reference": "7fa96885b99e9267b4ae5c0f463f5a550c47a66c"
+                "reference": "0c2001f2728b31017ba549cfebce1afea804eda3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ashwinks/PHP-LinkedIn-SDK/zipball/7fa96885b99e9267b4ae5c0f463f5a550c47a66c",
-                "reference": "7fa96885b99e9267b4ae5c0f463f5a550c47a66c",
+                "url": "https://api.github.com/repos/ashwinks/PHP-LinkedIn-SDK/zipball/0c2001f2728b31017ba549cfebce1afea804eda3",
+                "reference": "0c2001f2728b31017ba549cfebce1afea804eda3",
                 "shasum": ""
             },
             "require": {
@@ -243,13 +243,15 @@
                 "linkedin",
                 "rest"
             ],
-            "time": "2014-03-03 15:16:50"
+            "time": "2014-05-08 14:06:02"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "linkedinapi/linkedin": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

@@ -18,7 +18,7 @@
 		"lib-curl": "*",
 		"facebook/php-sdk-v4": "4.0.*",
 		"abraham/twitteroauth": "0.3.*",
-		"linkedinapi/linkedin": "^1.1.0",
+		"linkedinapi/linkedin": "dev-master",
 		"composer/installers": ">=1.0.8"
 	}
 }
