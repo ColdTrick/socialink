@@ -45,49 +45,52 @@ function socialink_create_object_handler($event, $entity_type, $entity) {
  * @return void
  */
 function socialink_login_user_handler($event, $type, $entity) {
-	global $SESSION;
-
-	if (!empty($entity) && elgg_instanceof($entity, "user")) {
-		// check if the user wishes to link a network
-		$link_network = get_input("socialink_link_network");
-			
-		if (!empty($link_network) && socialink_is_available_network($link_network)) {
-			switch ($link_network) {
-				case "twitter":
-					socialink_twitter_authorize($entity->getGUID());
-					break;
-				case "facebook":
-					socialink_facebook_authorize($entity->getGUID());
-					break;
-				case "linkedin":
-					socialink_linkedin_authorize($entity->getGUID());
-					break;
-				case "wordpress":
-					socialink_wordpress_authorize($entity->getGUID());
-					break;
-			}
-
-			$SESSION->offsetUnset("socialink_token");
-			
-			// sync network data
-			elgg_trigger_plugin_hook("socialink:sync", "user", array("user" => $entity, "network" => $link_network));
-		}
+	
+	if (empty($entity) || !elgg_instanceof($entity, "user")) {
+		return;
+	}
+	
+	// check if the user wishes to link a network
+	$link_network = get_input("socialink_link_network");
 		
-		// check if network connections are still valid
-		$networks = socialink_get_user_networks($entity->getGUID());
-		if (!empty($networks)) {
-			foreach ($networks as $network) {
-				$response = socialink_validate_network($network, $entity->getGUID());
-				
-				if ($response === false) {
-					// disconnect from this network and report to user
-					$function = "socialink_" . $network . "_remove_connection";
-					
-					if (is_callable($function)) {
-						call_user_func($function, $entity->getGUID());
-						register_error(sprintf(elgg_echo("socialink:network_invalid"), elgg_echo("socialink:network:" . $network)));
-					}
-				}
+	if (!empty($link_network) && socialink_is_available_network($link_network)) {
+		switch ($link_network) {
+			case "twitter":
+				socialink_twitter_authorize($entity->getGUID());
+				break;
+			case "facebook":
+				socialink_facebook_authorize($entity->getGUID());
+				break;
+			case "linkedin":
+				socialink_linkedin_authorize($entity->getGUID());
+				break;
+			case "wordpress":
+				socialink_wordpress_authorize($entity->getGUID());
+				break;
+		}
+
+		unset($_SESSION["socialink_token"]);
+		
+		// sync network data
+		elgg_trigger_plugin_hook("socialink:sync", "user", array("user" => $entity, "network" => $link_network));
+	}
+	
+	// check if network connections are still valid
+	$networks = socialink_get_user_networks($entity->getGUID());
+	if (empty($networks)) {
+		return;
+	}
+	
+	foreach ($networks as $network) {
+		$response = socialink_validate_network($network, $entity->getGUID());
+		
+		if ($response === false) {
+			// disconnect from this network and report to user
+			$function = "socialink_" . $network . "_remove_connection";
+			
+			if (is_callable($function)) {
+				call_user_func($function, $entity->getGUID());
+				register_error(sprintf(elgg_echo("socialink:network_invalid"), elgg_echo("socialink:network:" . $network)));
 			}
 		}
 	}

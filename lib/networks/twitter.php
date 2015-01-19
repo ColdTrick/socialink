@@ -8,7 +8,7 @@
  *
  * @param array $keys API keys
  *
- * @return bool|TwitterProxy
+ * @return bool|Abraham\TwitterOAuth\TwitterOAuth
  */
 function socialink_twitter_get_api_object($keys) {
 	$result = false;
@@ -25,10 +25,13 @@ function socialink_twitter_get_api_object($keys) {
 			$oauth_secret = null;
 		}
 		
-		$result = new TwitterProxy($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
+		$result = new Abraham\TwitterOAuth\TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
 		
-		if ($proxy_settings = socialink_get_proxy_settings()) {
-			$result->setProxySettings($proxy_settings);
+		$proxy_settings = socialink_get_proxy_settings();
+		if (!empty($proxy_settings)) {
+			$proxy_settings["CURLOPT_PROXYUSERPWD"] = "";
+			
+			$result->setProxy($proxy_settings);
 		}
 	}
 	
@@ -43,24 +46,32 @@ function socialink_twitter_get_api_object($keys) {
  * @return bool
  */
 function socialink_twitter_is_connected($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (!empty($user_guid) && ($keys = socialink_twitter_available())) {
-		$oauth_token = elgg_get_plugin_user_setting("twitter_oauth_token", $user_guid, "socialink");
-		$oauth_secret = elgg_get_plugin_user_setting("twitter_oauth_secret", $user_guid, "socialink");
-		
-		if (!empty($oauth_token) && !empty($oauth_secret)) {
-			$result = $keys;
-			$result["oauth_token"] = $oauth_token;
-			$result["oauth_secret"] = $oauth_secret;
-		}
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	$keys = socialink_twitter_available();
+	if (empty($keys)) {
+		return false;
+	}
+	
+	$oauth_token = elgg_get_plugin_user_setting("twitter_oauth_token", $user_guid, "socialink");
+	$oauth_secret = elgg_get_plugin_user_setting("twitter_oauth_secret", $user_guid, "socialink");
+	
+	if (empty($oauth_token) || empty($oauth_secret)) {
+		return false;
+	}
+		
+	$keys["oauth_token"] = $oauth_token;
+	$keys["oauth_secret"] = $oauth_secret;
+	
+	return $keys;
 }
 
 /**
@@ -70,28 +81,34 @@ function socialink_twitter_is_connected($user_guid = 0) {
  *
  * @return bool|string
  */
-function socialink_twitter_get_authorize_url($callback = NULL) {
-	global $SESSION;
+function socialink_twitter_get_authorize_url($callback = null) {
 	
 	$result = false;
 	
-	if ($keys = socialink_twitter_available()) {
+	$keys = socialink_twitter_available();
+	if (empty($keys)) {
+		return $result;
+	}
+	
+	$api = socialink_twitter_get_api_object($keys);
+	if (empty($api)) {
+		return $result;
+	}
+	
+	try {
+		$token = $api->oauth("oauth/request_token", array(
+			"oauth_callback" => $callback
+		));
 		
-		if ($api = socialink_twitter_get_api_object($keys)) {
-			try {
-				$token = $api->getRequestToken($callback);
-				
-				// save token in session for use after authorization
-				$SESSION['socialink_twitter'] = array(
-					'oauth_token' => $token['oauth_token'],
-					'oauth_token_secret' => $token['oauth_token_secret'],
-				);
-			
-				$result = $api->getAuthorizeURL($token['oauth_token']);
-			} catch (Exception $e) {
-				register_error($e->getMessage());
-			}
-		}
+		// save token in session for use after authorization
+		$_SESSION["socialink_twitter"] = array(
+			"oauth_token" => $token["oauth_token"],
+			"oauth_token_secret" => $token["oauth_token_secret"],
+		);
+	
+		$result = $api->url("oauth/authorize", array("oauth_token" => $token["oauth_token"]));
+	} catch (Exception $e) {
+		register_error($e->getMessage());
 	}
 	
 	return $result;
@@ -104,25 +121,32 @@ function socialink_twitter_get_authorize_url($callback = NULL) {
  *
  * @return bool|string
  */
-function socialink_twitter_get_access_token($oauth_verifier = NULL) {
-	global $SESSION;
-	
+function socialink_twitter_get_access_token($oauth_verifier = null) {
 	$result = true;
 
-	if ($keys = socialink_twitter_available()) {
-		if (isset($SESSION['socialink_twitter'])) {
-			// retrieve stored tokens
-			$keys['oauth_token'] = $SESSION['socialink_twitter']['oauth_token'];
-			$keys['oauth_secret'] = $SESSION['socialink_twitter']['oauth_token_secret'];
-			$SESSION->offsetUnset('socialink_twitter');
-			
-			// fetch an access token
-			if ($api = socialink_twitter_get_api_object($keys)) {
-				$result = $api->getAccessToken($oauth_verifier);
-			}
-		} elseif (isset($SESSION["socialink_token"])) {
-			$result = $SESSION["socialink_token"];
+	$keys = socialink_twitter_available();
+	if (empty($keys)) {
+		return $result;
+	}
+	
+	if (isset($_SESSION["socialink_twitter"])) {
+		// retrieve stored tokens
+		$keys["oauth_token"] = $_SESSION["socialink_twitter"]["oauth_token"];
+		$keys["oauth_secret"] = $_SESSION["socialink_twitter"]["oauth_token_secret"];
+		unset($_SESSION["socialink_twitter"]);
+		
+		// fetch an access token
+		$api = socialink_twitter_get_api_object($keys);
+		if (empty($api)) {
+			return $result;
 		}
+		
+		try {
+			$result = $api->oauth("oauth/access_token", array("oauth_verifier" => $oauth_verifier));
+		} catch (TwitterOAuthException $e) {}
+		
+	} elseif (isset($_SESSION["socialink_token"])) {
+		$result = $_SESSION["socialink_token"];
 	}
 	
 	return $result;
@@ -132,62 +156,66 @@ function socialink_twitter_get_access_token($oauth_verifier = NULL) {
  * Authorize a Twitter account
  *
  * @param int    $user_guid the user_guid to authorize
- * @param string $token     API tokens
  *
  * @return bool
  */
-function socialink_twitter_authorize($user_guid = 0, $token = null) {
-	$result = false;
+function socialink_twitter_authorize($user_guid = 0) {
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	$oauth_verifier = get_input('oauth_verifier', NULL);
-	
-	if (!empty($user_guid) && ($token = socialink_twitter_get_access_token($oauth_verifier))) {
-		
-		if (isset($token["oauth_token"]) && isset($token["oauth_token_secret"])) {
-			// only one user per tokens
-			$params = array(
-				"type" => "user",
-				"limit" => false,
-				"site_guids" => false,
-				"plugin_id" => "socialink",
-				"plugin_user_setting_name_value_pairs" => array(
-					"twitter_oauth_token" => $token["oauth_token"],
-					"twitter_oauth_secret" => $token["oauth_token_secret"]
-				)
-			);
-			
-			// find hidden users (just created)
-			$access_status = access_get_show_hidden_status();
-			access_show_hidden_entities(true);
-			
-			if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-				foreach ($users as $user) {
-					// revoke access
-					elgg_unset_plugin_user_setting("twitter_oauth_token", $user->getGUID(), "socialink");
-					elgg_unset_plugin_user_setting("twitter_oauth_secret", $user->getGUID(), "socialink");
-					elgg_unset_plugin_user_setting("twitter_screen_name", $user->getGUID(), "socialink");
-					elgg_unset_plugin_user_setting("twitter_user_id", $user->getGUID(), "socialink");
-				}
-			}
-			
-			// restore hidden status
-			access_show_hidden_entities($access_status);
-				
-			// register user"s access tokens
-			elgg_set_plugin_user_setting("twitter_user_id", $token["user_id"], $user_guid, "socialink");
-			elgg_set_plugin_user_setting("twitter_screen_name", $token["screen_name"], $user_guid, "socialink");
-			elgg_set_plugin_user_setting("twitter_oauth_token", $token["oauth_token"], $user_guid, "socialink");
-			elgg_set_plugin_user_setting("twitter_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
-			
-			$result = true;
-		}
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	$oauth_verifier = get_input("oauth_verifier");
+	$token = socialink_twitter_get_access_token($oauth_verifier);
+	
+	if (empty($token)) {
+		return false;
+	}
+	
+	if (!isset($token["oauth_token"]) || !isset($token["oauth_token_secret"])) {
+		return false;
+	}
+	
+	// only one user per tokens
+	$params = array(
+		"type" => "user",
+		"limit" => false,
+		"site_guids" => false,
+		"plugin_id" => "socialink",
+		"plugin_user_setting_name_value_pairs" => array(
+			"twitter_oauth_token" => $token["oauth_token"],
+			"twitter_oauth_secret" => $token["oauth_token_secret"]
+		)
+	);
+	
+	// find hidden users (just created)
+	$access_status = access_get_show_hidden_status();
+	access_show_hidden_entities(true);
+	
+	$users = new ElggBatch("elgg_get_entities_from_plugin_user_settings", $params);
+	foreach ($users as $user) {
+		// revoke access
+		elgg_unset_plugin_user_setting("twitter_oauth_token", $user->getGUID(), "socialink");
+		elgg_unset_plugin_user_setting("twitter_oauth_secret", $user->getGUID(), "socialink");
+		elgg_unset_plugin_user_setting("twitter_screen_name", $user->getGUID(), "socialink");
+		elgg_unset_plugin_user_setting("twitter_user_id", $user->getGUID(), "socialink");
+	}
+	
+	// restore hidden status
+	access_show_hidden_entities($access_status);
+	
+	// register user"s access tokens
+	elgg_set_plugin_user_setting("twitter_user_id", $token["user_id"], $user_guid, "socialink");
+	elgg_set_plugin_user_setting("twitter_screen_name", $token["screen_name"], $user_guid, "socialink");
+	elgg_set_plugin_user_setting("twitter_oauth_token", $token["oauth_token"], $user_guid, "socialink");
+	elgg_set_plugin_user_setting("twitter_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
+	
+	return true;
 }
 
 /**
@@ -198,22 +226,27 @@ function socialink_twitter_authorize($user_guid = 0, $token = null) {
  * @return bool
  */
 function socialink_twitter_remove_connection($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (!empty($user_guid) && socialink_twitter_is_connected($user_guid)) {
-		elgg_unset_plugin_user_setting("twitter_oauth_token", $user_guid, "socialink");
-		elgg_unset_plugin_user_setting("twitter_oauth_secret", $user_guid, "socialink");
-		elgg_unset_plugin_user_setting("twitter_screen_name", $user_guid, "socialink");
-		elgg_unset_plugin_user_setting("twitter_user_id", $user_guid, "socialink");
-		
-		$result = true;
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	if (!socialink_twitter_is_connected($user_guid)) {
+		return false;
+	}
+	
+	// cleanup all twitter user settings
+	elgg_unset_plugin_user_setting("twitter_oauth_token", $user_guid, "socialink");
+	elgg_unset_plugin_user_setting("twitter_oauth_secret", $user_guid, "socialink");
+	elgg_unset_plugin_user_setting("twitter_screen_name", $user_guid, "socialink");
+	elgg_unset_plugin_user_setting("twitter_user_id", $user_guid, "socialink");
+	
+	return true;
 }
 
 /**
@@ -225,22 +258,43 @@ function socialink_twitter_remove_connection($user_guid = 0) {
  * @return bool
  */
 function socialink_twitter_post_message($message, $user_guid = 0) {
-	$result = false;
 	
+	if (empty($message)) {
+		return false;
+	}
+	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (!empty($message) && !empty($user_guid) && ($keys = socialink_twitter_is_connected($user_guid))) {
-		if ($api = socialink_twitter_get_api_object($keys)) {
-			$url = "statuses/update";
-			$params = array("status" => $message);
-			
-			$result = $api->post($url, $params);
-		}
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	$keys = socialink_twitter_is_connected($user_guid);
+	if (empty($keys)) {
+		return false;
+	}
+	
+	$api = socialink_twitter_get_api_object($keys);
+	if (empty($api)) {
+		return false;
+	}
+	
+	// post the message
+	$url = "statuses/update";
+	$params = array("status" => $message);
+	
+	try {
+		$api->post($url, $params);
+		
+		if ($api->lastHttpCode() == 200) {
+			return true;
+		}
+	} catch (TwitterOAuthException $e) {}
+	
+	return false;
 }
 
 /**
@@ -251,26 +305,42 @@ function socialink_twitter_post_message($message, $user_guid = 0) {
  * @return bool|array
  */
 function socialink_twitter_get_profile_information($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (!empty($user_guid) && ($keys = socialink_twitter_is_connected($user_guid))) {
-		if ($api = socialink_twitter_get_api_object($keys)) {
-			$url = "users/show";
-			$params = array(
-				"screen_name" => elgg_get_plugin_user_setting("twitter_screen_name", $user_guid, "socialink")
-			);
-			
-			if ($result = $api->get($url, $params)) {
-				$result->socialink_profile_url = "http://www.twitter.com/" . $result->screen_name;
-			}
-		}
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	$keys = socialink_twitter_is_connected($user_guid);
+	if (empty($keys)) {
+		return false;
+	}
+	
+	$api = socialink_twitter_get_api_object($keys);
+	if (empty($api)) {
+		return false;
+	}
+	
+	$url = "users/show";
+	$params = array(
+		"screen_name" => elgg_get_plugin_user_setting("twitter_screen_name", $user_guid, "socialink")
+	);
+	
+	try {
+		$result = $api->get($url, $params);
+		
+		if ($api->lastHttpCode() == 200) {
+			$result->socialink_profile_url = "https://www.twitter.com/" . $result->screen_name;
+			
+			return $result;
+		}
+	} catch (TwitterOAuthException $e) {}
+	
+	return false;
 }
 
 /**

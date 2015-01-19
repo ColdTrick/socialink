@@ -1,6 +1,6 @@
 <?php
 
-$plugin = $vars["entity"];
+$plugin = elgg_extract("entity", $vars);
 
 $yesno_options = array(
 	"no" => elgg_echo("option:no"),

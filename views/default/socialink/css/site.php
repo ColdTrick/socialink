@@ -1,24 +1,28 @@
-<?php ?>
+<?php
+
+$graphics_base = elgg_normalize_url("mod/socialink/_graphics/");
+
+?>
 #socialink_usersettings_twitter_icon {
-	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/twitter/logo_withbird_90x17_allblue.png") transparent top left no-repeat;
+	background: url("<?php echo $graphics_base; ?>twitter/logo_withbird_90x17_allblue.png") transparent top left no-repeat;
 	width: 90px;
 	height: 17px;
 }
 
 #socialink_usersettings_facebook_icon {
-	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/facebook/logo_90x20.png") transparent top left no-repeat;
+	background: url("<?php echo $graphics_base; ?>facebook/logo_90x20.png") transparent top left no-repeat;
 	width: 90px;
 	height: 20px;
 }
 
 #socialink_usersettings_linkedin_icon {
-	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/linkedin/logo_84x22.png") transparent top left no-repeat;
+	background: url("<?php echo $graphics_base; ?>linkedin/logo_84x22.png") transparent top left no-repeat;
 	width: 84px;
 	height: 22px;
 }
 
 #socialink_usersettings_wordpress_icon {
-	background: url("<?php echo $vars["url"]; ?>mod/socialink/_graphics/wordpress/logo_88x20.png") transparent top left no-repeat;
+	background: url("<?php echo $graphics_base; ?>wordpress/logo_88x20.png") transparent top left no-repeat;
 	width: 88px;
 	height: 20px;
 }

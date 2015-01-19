@@ -15,21 +15,13 @@ echo "<div class='socialink_usersettings_network_config'>";
 	
 // is the user conntected
 if (socialink_twitter_is_connected($user->getGUID())) {
-	$twitter_remove_link = elgg_add_action_tokens_to_url($vars["url"] . "action/socialink/remove?service=twitter");
+	$twitter_remove_link = elgg_add_action_tokens_to_url("action/socialink/remove?service=twitter");
 	$twitter_screen_name = $plugin->getUserSetting("twitter_screen_name");
 	
 	$link_begin = "<a href='" . $twitter_remove_link . "'>";
 	$link_end = "</a>";
 	
 	echo "<div>" . elgg_echo("socialink:usersettings:twitter:remove", array($twitter_screen_name, $link_begin, $link_end)) . "</div>";
-	
-	// check for the wire
-// 	if(is_plugin_enabled("thewire")){
-// 		echo "<div>";
-// 		echo elgg_echo("socialink:usersettings:twitter:thewire");
-// 		echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[thewire_post_twitter]", "options_values" => $yesno_options_values, "value" => $usersettings->thewire_post_twitter));
-// 		echo "</div>";
-// 	}
 	
 	// configure profile synchronisation
 	if ($fields = socialink_get_configured_network_fields("twitter")) {
@@ -90,7 +82,8 @@ if (socialink_twitter_is_connected($user->getGUID())) {
 	}
 	
 } else {
-	$link_begin = "<a href='" . $vars["url"] . "socialink/forward/twitter/authorize' target='_self'>";
+	$url = elgg_normalize_url("socialink/forward/twitter/authorize");
+	$link_begin = "<a href='" . $url . "' target='_self'>";
 	$link_end = "</a>";
 	
 	echo elgg_echo("socialink:usersettings:twitter:not_connected", array($link_begin, $link_end));

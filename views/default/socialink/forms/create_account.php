@@ -1,6 +1,6 @@
 <?php
 
-$network = $vars["network"];
+$network = elgg_extract("network", $vars);
 $network_string = elgg_echo("socialink:network:" . $network);
 
 $form_data = "<div class='mbs'>" . elgg_echo("socialink:create_account:" . $network . ":description") . "</div>";
@@ -19,7 +19,7 @@ $form_data .= "</div>";
 
 $form = elgg_view("input/form", array(
 	"body" => $form_data,
-	"action" => $vars["url"] . "action/socialink/create_user"
+	"action" => "action/socialink/create_user"
 ));
 
 $form .= "<div class='elgg-quiet mts'>" . elgg_echo("socialink:create_account:disclaimer") . "</div>";

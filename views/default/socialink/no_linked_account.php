@@ -1,7 +1,7 @@
 <?php
 
-$network = $vars["network"];
-$allow_create = $vars["allow_create"];
+$network = elgg_extract("network", $vars);
+$allow_create = elgg_extract("allow_create", $vars);
 
 $network_string = elgg_echo("socialink:network:" . $network);
 

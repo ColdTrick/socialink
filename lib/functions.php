@@ -3,30 +3,16 @@
  * All helper functions are bundled here
  */
 
-global $SOCIALINK_PROXY_SETTINGS;
-
 /**
  * Load all the configured social network libraries
  *
  * @return void
  */
 function socialink_load_networks() {
-	global $SOCIALINK_PROXY_SETTINGS;
 	
 	if ($networks = socialink_get_available_networks()) {
 		foreach ($networks as $network) {
 			elgg_load_library("socialink:" . $network);
-		}
-		
-		// get proxy settings
-		$proxy_host = elgg_get_plugin_setting("proxy_host", "socialink");
-		$proxy_port = (int) elgg_get_plugin_setting("proxy_port", "socialink");
-		
-		if (!empty($proxy_host)) {
-			$SOCIALINK_PROXY_SETTINGS = array(
-				"host" => $proxy_host,
-				"port" => $proxy_port
-			);
 		}
 	}
 }
@@ -248,12 +234,23 @@ function socialink_validate_network($network, $user_guid) {
  * @return bool|array
  */
 function socialink_get_proxy_settings() {
-	global $SOCIALINK_PROXY_SETTINGS;
-
-	$result = false;
-
-	if (!empty($SOCIALINK_PROXY_SETTINGS)) {
-		$result = $SOCIALINK_PROXY_SETTINGS;
+	static $result;
+	
+	if (!isset($result)) {
+		$result = false;
+		
+		// get proxy host setting
+		$proxy_host = elgg_get_plugin_setting("proxy_host", "socialink");
+		
+		if (!empty($proxy_host)) {
+			$result["CURLOPT_PROXY"] = $proxy_host;
+			
+			// get proxy port setting
+			$proxy_port = (int) elgg_get_plugin_setting("proxy_port", "socialink");
+			if (!empty($proxy_host)) {
+				$result["CURLOPT_PROXYPORT"] = $proxy_port;
+			}
+		}
 	}
 
 	return $result;

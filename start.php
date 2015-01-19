@@ -39,7 +39,7 @@ function socialink_init() {
 	
 	// register event handlers
 	//register_elgg_event_handler("create", "object", "socialink_create_object_handler");
-	elgg_register_event_handler("login", "user", "socialink_login_user_handler", 450);
+	elgg_register_event_handler("login:after", "user", "socialink_login_user_handler", 450);
 	
 	// hooks
 	elgg_register_plugin_hook_handler("socialink:sync", "user", "socialink_sync_network_hook");
