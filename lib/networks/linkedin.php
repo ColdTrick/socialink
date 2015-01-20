@@ -11,38 +11,40 @@
  * @return bool|LinkedInProxy
  */
 function socialink_linkedin_get_api_object($keys) {
-	$result = false;
 	
-	if (!empty($keys) && is_array($keys)) {
-		$api_config = array(
-			"appKey" => $keys["consumer_key"],
-			"appSecret" => $keys["consumer_secret"]
-		);
-		
-		try {
-			$api = new LinkedInProxy($api_config);
-			
-			if (isset($keys["oauth_token"]) && isset($keys["oauth_secret"])) {
-				$tokens = array(
-					"oauth_token" => $keys["oauth_token"],
-					"oauth_token_secret" => $keys["oauth_secret"]
-				);
-				
-				$api->setTokenAccess($tokens);
-			}
-			
-			// set response format to JSON
-			$api->setResponseFormat(LinkedIn::_RESPONSE_JSON);
-			
-			if ($proxy_settings = socialink_get_proxy_settings()) {
-				$api->setProxySettings($proxy_settings);
-			}
-			
-			$result = $api;
-		} catch (Exception $e) {}
+	if (empty($keys) || !is_array($keys)) {
+		return false;
 	}
 	
-	return $result;
+	$api_config = array(
+		"appKey" => $keys["consumer_key"],
+		"appSecret" => $keys["consumer_secret"]
+	);
+	
+	try {
+		$api = new LinkedInProxy($api_config);
+		
+		if (isset($keys["oauth_token"]) && isset($keys["oauth_secret"])) {
+			$tokens = array(
+				"oauth_token" => $keys["oauth_token"],
+				"oauth_token_secret" => $keys["oauth_secret"]
+			);
+			
+			$api->setTokenAccess($tokens);
+		}
+		
+		// set response format to JSON
+		$api->setResponseFormat(LinkedIn::_RESPONSE_JSON);
+		
+		$proxy_settings = socialink_get_proxy_settings();
+		if (!empty($proxy_settings)) {
+			$api->setProxySettings($proxy_settings);
+		}
+		
+		return $api;
+	} catch (Exception $e) {}
+	
+	return false;
 }
 
 /**
@@ -101,33 +103,37 @@ function socialink_linkedin_verify_response($response) {
  *
  * @return bool|string
  */
-function socialink_linkedin_get_authorize_url($callback = NULL) {
-	global $SESSION;
+function socialink_linkedin_get_authorize_url($callback = null) {
 	
-	$result = false;
-
-	if ($keys = socialink_linkedin_available()) {
-		if ($api = socialink_linkedin_get_api_object($keys)) {
-			try {
-				$api->setCallbackUrl($callback);
-				$response = $api->retrieveTokenRequest();
-				
-				if ($token = socialink_linkedin_verify_response($response)) {
-					//$token = $response["linkedin"];
-					
-					// save token in session for use after authorization
-					$SESSION['socialink_linkedin'] = array(
-						'oauth_token' => $token["oauth_token"],
-						'oauth_token_secret' => $token["oauth_token_secret"],
-					);
-				
-					$result = LinkedIn::_URL_AUTH . $token["oauth_token"];
-				}
-			} catch (Exception $e) {}
-		}
+	$keys = socialink_linkedin_available();
+	if (empty($keys)) {
+		return false;
 	}
 	
-	return $result;
+	$api = socialink_linkedin_get_api_object($keys);
+	if (empty($api)) {
+		return false;
+	}
+	
+	try {
+		$api->setCallbackUrl($callback);
+		$response = $api->retrieveTokenRequest();
+		
+		$token = socialink_linkedin_verify_response($response);
+		if (empty($token)) {
+			return false;
+		}
+		
+		// save token in session for use after authorization
+		$_SESSION['socialink_linkedin'] = array(
+			'oauth_token' => $token["oauth_token"],
+			'oauth_token_secret' => $token["oauth_token_secret"],
+		);
+		
+		return LinkedIn::_URL_AUTH . $token["oauth_token"];
+	} catch (Exception $e) {}
+	
+	return false;
 }
 
 /**
@@ -137,32 +143,36 @@ function socialink_linkedin_get_authorize_url($callback = NULL) {
  *
  * @return bool|string
  */
-function socialink_linkedin_get_access_token($oauth_verifier = NULL) {
-	global $SESSION;
+function socialink_linkedin_get_access_token($oauth_verifier = null) {
 	
-	$result = false;
-
-	if ($keys = socialink_linkedin_available()) {
-		if (isset($SESSION["socialink_linkedin"])) {
-			if ($api = socialink_linkedin_get_api_object($keys)) {
-				// retrieve stored tokens
-				$oauth_token = $SESSION['socialink_linkedin']['oauth_token'];
-				$oauth_token_secret = $SESSION['socialink_linkedin']['oauth_token_secret'];
-				$SESSION->offsetUnset('socialink_linkedin');
-			
-				// fetch an access token
-				try {
-					$response = $api->retrieveTokenAccess($oauth_token, $oauth_token_secret, $oauth_verifier);
-					
-					$result = socialink_linkedin_verify_response($response);
-				} catch (Exception $e) {}
-			}
-		} elseif ($SESSION["socialink_token"]) {
-			$result = $SESSION["socialink_token"];
-		}
+	$keys = socialink_linkedin_available();
+	if (empty($keys)) {
+		return false;
 	}
 	
-	return $result;
+	if (isset($_SESSION["socialink_linkedin"])) {
+		$api = socialink_linkedin_get_api_object($keys);
+		if (empty($api)) {
+			return false;
+		}
+		
+		// retrieve stored tokens
+		$oauth_token = $_SESSION['socialink_linkedin']['oauth_token'];
+		$oauth_token_secret = $_SESSION['socialink_linkedin']['oauth_token_secret'];
+		
+		unset($_SESSION["socialink_linkedin"]);
+	
+		try {
+			// fetch an access token
+			$response = $api->retrieveTokenAccess($oauth_token, $oauth_token_secret, $oauth_verifier);
+			
+			return socialink_linkedin_verify_response($response);
+		} catch (Exception $e) {}
+	} elseif ($_SESSION["socialink_token"]) {
+		return $_SESSION["socialink_token"];
+	}
+	
+	return false;
 }
 
 /**
@@ -173,52 +183,57 @@ function socialink_linkedin_get_access_token($oauth_verifier = NULL) {
  * @return bool
  */
 function socialink_linkedin_authorize($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	$oauth_verifier = get_input('oauth_verifier', NULL);
-	
-	if (!empty($user_guid) && ($token = socialink_linkedin_get_access_token($oauth_verifier))) {
-		if (isset($token['oauth_token']) && isset($token['oauth_token_secret'])) {
-			// only one user per tokens
-			$params = array(
-				"type" => "user",
-				"limit" => false,
-				"site_guids" => false,
-				"plugin_id" => "socialink",
-				"plugin_user_setting_name_value_pairs" => array(
-					"linkedin_oauth_token" => $token["oauth_token"],
-					"linkedin_oauth_secret" => $token["oauth_token_secret"],
-				)
-			);
-			
-			// find hidden users (just created)
-			$access_status = access_get_show_hidden_status();
-			access_show_hidden_entities(true);
-			
-			if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-				foreach ($users as $user) {
-					// revoke access
-					elgg_unset_plugin_user_setting("linkedin_oauth_token", $user->getGUID(), "socialink");
-					elgg_unset_plugin_user_setting("linkedin_oauth_secret", $user->getGUID(), "socialink");
-				}
-			}
-			
-			// restore hidden status
-			access_show_hidden_entities($access_status);
-			
-			// register user"s access tokens
-			elgg_set_plugin_user_setting("linkedin_oauth_token", $token["oauth_token"], $user_guid, "socialink");
-			elgg_set_plugin_user_setting("linkedin_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
-		
-			$result = true;
-		}
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	$oauth_verifier = get_input("oauth_verifier");
+	$token = socialink_linkedin_get_access_token($oauth_verifier);
+	if (empty($token)) {
+		return false;
+	}
+	
+	if (!isset($token["oauth_token"]) || !isset($token["oauth_token_secret"])) {
+		return false;
+	}
+	
+	// only one user per tokens
+	$params = array(
+		"type" => "user",
+		"limit" => false,
+		"site_guids" => false,
+		"plugin_id" => "socialink",
+		"plugin_user_setting_name_value_pairs" => array(
+			"linkedin_oauth_token" => $token["oauth_token"],
+			"linkedin_oauth_secret" => $token["oauth_token_secret"],
+		)
+	);
+	
+	// find hidden users (just created)
+	$access_status = access_get_show_hidden_status();
+	access_show_hidden_entities(true);
+	
+	$users = new Elggbatch("elgg_get_entities_from_plugin_user_settings", $params);
+	foreach ($users as $user) {
+		// revoke access
+		elgg_unset_plugin_user_setting("linkedin_oauth_token", $user->getGUID(), "socialink");
+		elgg_unset_plugin_user_setting("linkedin_oauth_secret", $user->getGUID(), "socialink");
+	}
+	
+	// restore hidden status
+	access_show_hidden_entities($access_status);
+	
+	// register user's access tokens
+	elgg_set_plugin_user_setting("linkedin_oauth_token", $token["oauth_token"], $user_guid, "socialink");
+	elgg_set_plugin_user_setting("linkedin_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
+
+	return true;
 }
 
 /**
@@ -289,27 +304,40 @@ function socialink_linkedin_post_message($message, $user_guid = 0) {
  * @return bool|array
  */
 function socialink_linkedin_get_profile_information($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (!empty($user_guid) && ($keys = socialink_linkedin_is_connected($user_guid))) {
-		if ($api = socialink_linkedin_get_api_object($keys)) {
-			try {
-				$response = $api->profile("~:(first-name,last-name,industry,public-profile-url,location:(name),picture-url)");
-				
-				if ($result = socialink_linkedin_verify_response($response)) {
-					$temp = json_decode($result);
-					$temp->socialink_name = ucwords($temp->firstName . " " . $temp->lastName);
-					$result = json_encode($temp);
-				}
-			} catch (Exception $e) {}
-		}
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	$keys = socialink_linkedin_is_connected($user_guid);
+	if (empty($keys)) {
+		return false;
+	}
+	
+	$api = socialink_linkedin_get_api_object($keys);
+	if (empty($api)) {
+		return false;
+	}
+	
+	try {
+		$response = $api->profile("~:(first-name,last-name,industry,public-profile-url,location:(name),picture-url,email-address)");
+		
+		$result = socialink_linkedin_verify_response($response);
+		if (empty($result)) {
+			return false;
+		}
+		
+		$temp = json_decode($result);
+		$temp->socialink_name = ucwords($temp->firstName . " " . $temp->lastName);
+		return json_encode($temp);
+	} catch (Exception $e) {}
+	
+	return false;
 }
 
 /**
@@ -469,74 +497,97 @@ function socialink_linkedin_sync_profile_icon($user_guid = 0) {
  * Create a user based on LinkedIn information
  *
  * @param string $token LinkedIn access token
- * @param string $email email address of the user
  *
  * @return bool|ElggUser
  */
-function socialink_linkedin_create_user($token, $email) {
-	$result = false;
+function socialink_linkedin_create_user($token) {
 	
-	if (!empty($token) && is_array($token) && !empty($email)) {
-		if (!get_user_by_email($email) && is_email_address($email)) {
-			$keys = socialink_linkedin_available();
-			
-			$keys["oauth_token"] = $token["oauth_token"];
-			$keys["oauth_secret"] = $token["oauth_token_secret"];
-			
-			if ($api = socialink_linkedin_get_api_object($keys)) {
-				try {
-					$response = $api->profile("~:(first-name,last-name)");
-				} catch (Exception $e) {}
-				
-				if ($api_result = socialink_linkedin_verify_response($response)) {
-					$api_result = json_decode($api_result);
-					
-					$name = $api_result->firstName . " " . $api_result->lastName;
-					$pwd = generate_random_cleartext_password();
-					
-					$username = socialink_create_username_from_email($email);
-					
-					try {
-						// register user
-						if ($user_guid = register_user($username, $pwd, $name, $email)) {
-							// show hidden entities
-							$access = access_get_show_hidden_status();
-							access_show_hidden_entities(TRUE);
-							
-							if ($user = get_user($user_guid)) {
-								// save user tokens
-								elgg_set_plugin_user_setting('linkedin_oauth_token', $token['oauth_token'], $user_guid, "socialink");
-								elgg_set_plugin_user_setting('linkedin_oauth_secret', $token['oauth_token_secret'], $user_guid, "socialink");
-								
-								// sync user data
-								socialink_linkedin_sync_profile_metadata($user->getGUID());
-								
-								// trigger hook for registration
-								$params = array(
-									"user" => $user,
-									"password" => $pwd,
-									"friend_guid" => 0,
-									"invitecode" => ""
-								);
-								
-								if (elgg_trigger_plugin_hook("register", "user", $params, true) !== false) {
-									// return the user
-									$result = $user;
-								}
-							}
-							
-							// restore hidden entities
-							access_show_hidden_entities($access);
-						}
-					} catch (Exception $e) {}
-				}
-			}
-		} else {
-			register_error(elgg_echo("socialink:networks:create_user:error:email"));
-		}
+	if (empty($token) || !is_array($token)) {
+		return false;
 	}
 	
-	return $result;
+	
+	$keys = socialink_linkedin_available();
+	if (empty($keys)) {
+		return false;
+	}
+	
+	$keys["oauth_token"] = $token["oauth_token"];
+	$keys["oauth_secret"] = $token["oauth_token_secret"];
+	
+	$api = socialink_linkedin_get_api_object($keys);
+	if (empty($api)) {
+		return false;
+	}
+	
+	try {
+		// get user data
+		$response = $api->profile("~:(first-name,last-name,email-address)");
+	} catch (Exception $e) {}
+	
+	$api_result = socialink_linkedin_verify_response($response);
+	if (empty($api_result)) {
+		return false;
+	}
+	
+	$api_result = json_decode($api_result);
+	
+	// build user information
+	$name = $api_result->firstName . " " . $api_result->lastName;
+	$email = $api_result->emailAddress;
+	$pwd = generate_random_cleartext_password();
+	
+	$username = socialink_create_username_from_email($email);
+	
+	// check email address
+	if (get_user_by_email($email)) {
+		register_error(elgg_echo("socialink:networks:create_user:error:email"));
+		return false;
+	}
+	
+	try {
+		// register user
+		$user_guid = register_user($username, $pwd, $name, $email);
+		if (empty($user_guid)) {
+			return false;
+		}
+		
+		// show hidden entities
+		$access = access_get_show_hidden_status();
+		access_show_hidden_entities(true);
+		
+		$user = get_user($user_guid);
+		if (empty($user)) {
+			access_show_hidden_entities($access);
+			return false;
+		}
+		
+		// save user tokens
+		elgg_set_plugin_user_setting("linkedin_oauth_token", $token["oauth_token"], $user_guid, "socialink");
+		elgg_set_plugin_user_setting("linkedin_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
+		
+		// sync user data
+		socialink_linkedin_sync_profile_metadata($user->getGUID());
+		
+		// trigger hook for registration
+		$params = array(
+			"user" => $user,
+			"password" => $pwd,
+			"friend_guid" => 0,
+			"invitecode" => ""
+		);
+		
+		if (elgg_trigger_plugin_hook("register", "user", $params, true) !== false) {
+			// return the user
+			access_show_hidden_entities($access);
+			return $user;
+		}
+		
+		// restore hidden entities
+		access_show_hidden_entities($access);
+	} catch (Exception $e) {}
+	
+	return false;
 }
 
 /**

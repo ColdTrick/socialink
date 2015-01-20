@@ -97,12 +97,12 @@ class LinkedInProxy extends LinkedIn {
 			
 			// check if we need to set proxy settings
 			if ($this->proxy) {
-				if (isset($this->proxy["host"])) {
-					curl_setopt($handle, CURLOPT_PROXY, $this->proxy["host"]);
+				if (isset($this->proxy["CURLOPT_PROXY"])) {
+					curl_setopt($handle, CURLOPT_PROXY, $this->proxy["CURLOPT_PROXY"]);
 				}
 				
-				if (isset($this->proxy["port"])) {
-					curl_setopt($handle, CURLOPT_PROXYPORT, $this->proxy["port"]);
+				if (isset($this->proxy["CURLOPT_PROXYPORT"])) {
+					curl_setopt($handle, CURLOPT_PROXYPORT, $this->proxy["CURLOPT_PROXYPORT"]);
 				}
 			}
 	

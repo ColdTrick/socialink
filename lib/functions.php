@@ -282,6 +282,7 @@ function socialink_get_network_fields($network) {
 			"linkedin" => array(
 				"firstname" => "firstName",
 				"lastname" => "lastName",
+				"email" => "emailAddress",
 				"name" => "socialink_name",
 				"profile_url" => "publicProfileUrl",
 				"location" => "location->name",

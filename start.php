@@ -18,6 +18,11 @@ elgg_register_event_handler("init", "system", "socialink_init");
  * @return void
  */
 function socialink_init() {
+	
+	// register classes
+	elgg_register_classes(dirname(__FILE__) . "/vendors/oauth/classes");
+	elgg_register_class("LinkedIn", dirname(__FILE__) . "/vendors/simple_linkedin/linkedin_3.1.1.class.php");
+	
 	// register SociaLink libraries
 	elgg_register_library("socialink:facebook", dirname(__FILE__) . "/lib/networks/facebook.php");
 	elgg_register_library("socialink:linkedin", dirname(__FILE__) . "/lib/networks/linkedin.php");

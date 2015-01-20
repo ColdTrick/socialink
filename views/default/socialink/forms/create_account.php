@@ -5,7 +5,7 @@ $network_string = elgg_echo("socialink:network:" . $network);
 
 $form_data = "<div class='mbs'>" . elgg_echo("socialink:create_account:" . $network . ":description") . "</div>";
 
-if (in_array($network, array("linkedin", "twitter"))) {
+if (in_array($network, array("twitter"))) {
 	$form_data .= "<div>";
 	$form_data .= "<label>" . elgg_echo("email") . "</label>";
 	$form_data .= elgg_view("input/email", array("name" => "email"));

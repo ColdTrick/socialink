@@ -30,12 +30,24 @@ if (socialink_twitter_is_connected($user->getGUID())) {
 		echo "<br />";
 		echo "<div>";
 		echo elgg_echo("socialink:usersettings:profile_sync", array($network_name));
-		echo "&nbsp;" . elgg_view("input/dropdown", array("name" => "params[twitter_sync_allow]", "options_values" => array_reverse($noyes_options_values), "value" => $plugin->getUserSetting("twitter_sync_allow"), "js" => "onchange='socialink_toggle_network_configure(this, \"twitter\");'"));
+		echo "&nbsp;" . elgg_view("input/dropdown", array(
+			"name" => "params[twitter_sync_allow]",
+			"options_values" => array_reverse($noyes_options_values),
+			"value" => $plugin->getUserSetting("twitter_sync_allow"),
+			"onchange" => "socialink_toggle_network_configure(this, 'twitter');"
+		));
 		echo "&nbsp;<span id='socialink_twitter_sync_configure' ";
 		if ($plugin->getUserSetting("twitter_sync_allow") != "no") {
 			echo "class='socialink_network_sync_allow'";
 		}
-		echo "><a href='javascript:void(0);' onclick='$(\"#socialink_twitter_sync_fields\").toggle();'>" . elgg_echo("socialink:configure") . "</a></span>";
+		echo ">";
+		echo elgg_view("output/url", array(
+			"text" => elgg_echo("socialink:configure"),
+			"href" => "#socialink_twitter_sync_fields",
+			"rel" => "toggle"
+		));
+		
+		echo "</span>";
 		echo "</div>";
 		
 		echo "<table id='socialink_twitter_sync_fields' class='elgg-table'>";
@@ -57,7 +69,11 @@ if (socialink_twitter_is_connected($user->getGUID())) {
 			
 			echo "<tr>";
 			echo "<td>" . elgg_echo("socialink:usersettings:profile_sync:explain", array($network_string, $profile_string)) . "</td>";
-			echo "<td>" . elgg_view("input/dropdown", array("name" => "params[" . $setting . "]", "options_values" => array_reverse($noyes_options_values, true), "value" => $plugin->getUserSetting($setting))) . "</td>";
+			echo "<td>" . elgg_view("input/dropdown", array(
+				"name" => "params[" . $setting . "]",
+				"options_values" => array_reverse($noyes_options_values, true),
+				"value" => $plugin->getUserSetting($setting)
+			)) . "</td>";
 			echo "<tr>";
 		}
 		

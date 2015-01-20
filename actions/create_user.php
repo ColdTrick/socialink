@@ -14,7 +14,7 @@ if (!elgg_is_logged_in() && !empty($_SESSION["socialink_token"])) {
 			
 			break;
 		case "linkedin":
-			$user = socialink_linkedin_create_user($token, $email);
+			$user = socialink_linkedin_create_user($token);
 			
 			break;
 		case "facebook":

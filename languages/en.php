@@ -46,6 +46,7 @@ return array(
 	'socialink:linkedin:field:firstname' => "Firstname",
 	'socialink:linkedin:field:lastname' => "Lastname",
 	'socialink:linkedin:field:name' => "Name",
+	'socialink:linkedin:field:email' => "E-mail address",
 	'socialink:linkedin:field:profile_url' => "Profile URL",
 	'socialink:linkedin:field:location' => "Location",
 	'socialink:linkedin:field:industry' => "Industry",
