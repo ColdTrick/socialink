@@ -1,4 +1,5 @@
 <?php
+use Facebook;
 /**
  * All Facebook releated helper functions are bundeld here
  */
@@ -6,55 +7,33 @@
 define("FACEBOOK_OAUTH_BASE_URL", "https://www.facebook.com/dialog/oauth?client_id=");
 
 /**
- * Get the API object
- *
- * @param array $keys API keys
- *
- * @return bool|FacebookProxy
- */
-function socialink_facebook_get_api_object($keys) {
-	$result = false;
-	
-	if (!empty($keys) && is_array($keys)) {
-		$config = array(
-			"appId" => $keys["app_id"],
-			"secret" => $keys["app_secret"]
-		);
-		
-		$result = new FacebookProxy($config);
-		
-		if ($proxy_settings = socialink_get_proxy_settings()) {
-			$result->setProxySettings($proxy_settings);
-		}
-	}
-	
-	return $result;
-}
-
-/**
  * Check if the user is connected to a Facebook account
  *
  * @param int $user_guid the user_guid to check
  *
- * @return bool
+ * @return bool|Facebook\FacebookSession
  */
 function socialink_facebook_is_connected($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (!empty($user_guid) && ($keys = socialink_facebook_available())) {
-		$token = elgg_get_plugin_user_setting("facebook_access_token", $user_guid, "socialink");
-		
-		if (!empty($token)) {
-			$result = $keys;
-			$result["access_token"] = $token;
-		}
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	if (!socialink_facebook_available()) {
+		return false;
+	}
+	
+	$token = elgg_get_plugin_user_setting("facebook_access_token", $user_guid, "socialink");
+	if (empty($token)) {
+		return false;
+	}
+	
+	return new Facebook\FacebookSession($token);
 }
 
 /**
@@ -65,91 +44,61 @@ function socialink_facebook_is_connected($user_guid = 0) {
  * @return bool|string
  */
 function socialink_facebook_get_authorize_url($callback) {
-	global $SESSION;
 	
-	$result = false;
-	
-	if (!empty($callback) && ($keys = socialink_facebook_available())) {
-		if ($api = socialink_facebook_get_api_object($keys)) {
-			$state = generate_action_token(time());
-			$app_id = $api->getAppId();
-			$callback = urlencode($callback);
-			$scope = "offline_access,publish_stream,user_about_me,user_location,email";
-			
-			$SESSION["socialink_facebook"] = array(
-				"state" => $state,
-				"callback" => $callback
-			);
-			
-			$result = FACEBOOK_OAUTH_BASE_URL . $app_id . "&redirect_uri=" . $callback . "&state=" . $state . "&scope=" . $scope;
-		}
+	if (empty($callback)) {
+		return false;
+	}
+
+	if (!socialink_facebook_available()) {
+		return false;
 	}
 	
-	return $result;
+	$_SESSION["socialink_facebook"] = array(
+		"callback" => $callback
+	);
+	
+	$redirect = new Facebook\FacebookRedirectLoginHelper($callback);
+	
+	$scope = array("offline_access", "publish_stream", "user_about_me", "user_location", "email");
+	return $redirect->getLoginUrl($scope);
 }
 
 /**
  * Get a Facebook access token
  *
- * @param string $state the API state
- *
  * @return bool|string
  */
-function socialink_facebook_get_access_token($state = NULL) {
-	global $SESSION;
+function socialink_facebook_get_access_token() {
 	
-	$result = false;
-	
-	$error = get_input("error");
-	
-	if (empty($error) && ($keys = socialink_facebook_available())) {
-		if (isset($SESSION["socialink_facebook"]) && isset($SESSION["socialink_facebook"]["state"])) {
-			$session_state = $SESSION["socialink_facebook"]["state"];
-			$session_callback = $SESSION["socialink_facebook"]["callback"];
-			
-			if ($state == $session_state) {
-				$SESSION->offsetUnset('socialink_facebook');
-				// fetch an access token
-				if ($api = socialink_facebook_get_api_object($keys)) {
-					
-					$url = "oauth/access_token";
-					$params = array(
-						"client_id" => $api->getAppId(),
-						"client_secret" => $api->getApiSecret(),
-						"code" => get_input("code")
-					);
-					
-					$base_url = Facebook::$DOMAIN_MAP["graph"];
-					
-					$url_post_fix = http_build_query($params, null, "&");
-					// session callback not in params as it is already html encoded
-					$url = $base_url . $url . "?redirect_uri=" . $session_callback . "&" . $url_post_fix;
-					
-					$ch = curl_init($url);
-					curl_setopt($ch, CURLOPT_HEADER, false);
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-					
-					$response = curl_exec($ch);
-					curl_close($ch);
-					
-					if (!empty($response)) {
-						list($token) = preg_split('/access_token=([a-zA-Z0-9]+)/', $response, 2,  PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-
-						if (!empty($token)) {
-							$result = $token;
-						}
-					}
-				}
-			}
-		} elseif (isset($SESSION["socialink_token"])) {
-			$result = $SESSION["socialink_token"];
-		}
-	} elseif (!empty($error)) {
-		$msg = urldecode(get_input("error_description"));
-		register_error($msg);
+	if (!socialink_facebook_available()) {
+		return false;
 	}
 	
-	return $result;
+	if (isset($_SESSION["socialink_facebook"]) && isset($_SESSION["socialink_facebook"]["callback"])) {
+		
+		$callback = $_SESSION["socialink_facebook"]["callback"];
+		$redirect = new Facebook\FacebookRedirectLoginHelper($callback);
+		$session = $redirect->getSessionFromRedirect();
+		
+		if (empty($session)) {
+			return false;
+		}
+		
+		unset($_SESSION["socialink_facebook"]);
+		
+		$token = $session->getAccessToken();
+		if (empty($token)) {
+			return false;
+		}
+		
+		$token->extend();
+		
+		return (string) $token;
+	} elseif (isset($_SESSION["socialink_token"])) {
+		return $_SESSION["socialink_token"];
+	}
+	
+	return false;
 }
 
 /**
@@ -160,45 +109,56 @@ function socialink_facebook_get_access_token($state = NULL) {
  * @return bool
  */
 function socialink_facebook_authorize($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	$state = get_input('state', NULL);
-	
-	if (!empty($user_guid) && ($token = socialink_facebook_get_access_token($state))) {
-		// only one user per tokens
-		$params = array(
-			"type" => "user",
-			"limit" => false,
-			"site_guids" => false,
-			"plugin_id" => "socialink",
-			"plugin_user_setting_name_value_pairs" => array(
-				"facebook_access_token" => $token
-			)
-		);
-		
-		// find hidden users (just created)
-		$access_status = access_get_show_hidden_status();
-		access_show_hidden_entities(true);
-		
-		if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-			foreach ($users as $user) {
-				// revoke access
-				elgg_unset_plugin_user_setting("facebook_access_token", $user->getGUID(), "socialink");
-			}
-		}
-		
-		// restore hidden status
-		access_show_hidden_entities($access_status);
-		
-		// register user's access tokens
-		$result = elgg_set_plugin_user_setting("facebook_access_token", $token, $user_guid, "socialink");
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	$token = socialink_facebook_get_access_token();
+	if (empty($token)) {
+		return false;
+	}
+	
+	$user_id = socialink_facebook_get_user_id_from_access_token($token);
+	if (empty($user_id)) {
+		return false;
+	}
+	
+	// only one user per tokens
+	$params = array(
+		"type" => "user",
+		"limit" => false,
+		"site_guids" => false,
+		"plugin_id" => "socialink",
+		"plugin_user_setting_name_value_pairs" => array(
+			"facebook_user_id" => $user_id
+		)
+	);
+	
+	// find hidden users (just created)
+	$access_status = access_get_show_hidden_status();
+	access_show_hidden_entities(true);
+	
+	$users = new ElggBatch("elgg_get_entities_from_plugin_user_settings", $params);
+	foreach ($users as $user) {
+		// revoke access
+		elgg_unset_plugin_user_setting("facebook_access_token", $user->getGUID(), "socialink");
+		elgg_unset_plugin_user_setting("facebook_user_id", $user->getGUID(), "socialink");
+	}
+	
+	// restore hidden status
+	access_show_hidden_entities($access_status);
+	
+	// register user's access tokens
+	elgg_set_plugin_user_setting("facebook_access_token", $token, $user_guid, "socialink");
+	elgg_set_plugin_user_setting("facebook_user_id", $user_id, $user_guid, "socialink");
+	
+	return true;
 }
 
 /**
@@ -209,18 +169,25 @@ function socialink_facebook_authorize($user_guid = 0) {
  * @return bool
  */
 function socialink_facebook_remove_connection($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (!empty($user_guid) && socialink_facebook_is_connected($user_guid)) {
-		// remove plugin settings
-		$result = elgg_unset_plugin_user_setting("facebook_access_token", $user_guid, "socialink");
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	if (!socialink_facebook_is_connected($user_guid)) {
+		return false;
+	}
+	
+	// remove plugin settings
+	elgg_unset_plugin_user_setting("facebook_access_token", $user_guid, "socialink");
+	elgg_unset_plugin_user_setting("facebook_user_id", $user_guid, "socialink");
+	
+	return true;
 }
 
 /**
@@ -232,28 +199,40 @@ function socialink_facebook_remove_connection($user_guid = 0) {
  * @return bool
  */
 function socialink_facebook_post_message($message, $user_guid = 0) {
-	$result = false;
 	
+	if (empty($message)) {
+		return false;
+	}
+	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (!empty($message) && !empty($user_guid) && ($keys = socialink_facebook_is_connected($user_guid))) {
-		if ($api = socialink_facebook_get_api_object($keys)) {
-			$url = "me/feed";
-			$method = "POST";
-			$params = array(
-				"access_token" => $keys["access_token"],
-				"message" => $message,
-			);
-			
-			try {
-				$result = $api->api($url, $method, $params);
-			} catch(Exception $e){}
-		}
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	$session = socialink_facebook_is_connected($user_guid);
+	if (empty($session)) {
+		return false;
+	}
+	
+	$request = new FaceBook\FacebookRequest($session, "POST", "/me/feed", array("message" => $message));
+	
+	// set correct proxy settings (if needed)
+	$curl_http_client = socialink_facebook_get_curl_http_client();
+	$request->setHttpClientHandler($curl_http_client);
+	
+	try {
+		$api_result = $request->execute()->getGraphObject(Facebook\GraphUser::className());
+	} catch(Exception $e) {}
+	
+	if (empty($api_result)) {
+		return false;
+	}
+	
+	return true;
 }
 
 /**
@@ -261,30 +240,39 @@ function socialink_facebook_post_message($message, $user_guid = 0) {
  *
  * @param int $user_guid the user_guid to get the information from
  *
- * @return bool|array
+ * @return bool|Facebook\GraphUser
  */
 function socialink_facebook_get_profile_information($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (!empty($user_guid) && ($keys = socialink_facebook_is_connected($user_guid))) {
-		if ($api = socialink_facebook_get_api_object($keys)) {
-			$url = "me";
-			$params = array(
-				"access_token" => $keys["access_token"],
-				"fields" => "name,first_name,last_name,link,email,location,gender,about,bio,hometown"
-			);
-			
-			try{
-				$result = $api->api($url, $params);
-			} catch(Exception $e){}
-		}
+	if (empty($user_guid)) {
+		return false;
 	}
 	
-	return $result;
+	$session = socialink_facebook_is_connected($user_guid);
+	if (empty($session)) {
+		return false;
+	}
+	
+	$request = new FaceBook\FacebookRequest($session, "GET", "/me");
+	
+	// set correct proxy settings (if needed)
+	$curl_http_client = socialink_facebook_get_curl_http_client();
+	$request->setHttpClientHandler($curl_http_client);
+	
+	try {
+		$api_result = $request->execute()->getGraphObject(Facebook\GraphUser::className());
+	} catch(Exception $e) {}
+	
+	if (empty($api_result)) {
+		return false;
+	}
+	
+	return $api_result;
 }
 
 /**
@@ -295,83 +283,101 @@ function socialink_facebook_get_profile_information($user_guid = 0) {
  * @return void
  */
 function socialink_facebook_sync_profile_metadata($user_guid = 0) {
-	global $CONFIG;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	// can we get a user
-	if (($user = get_user($user_guid)) && socialink_facebook_is_connected($user_guid)) {
-		// does the user allow sync
-		if (elgg_get_plugin_user_setting("facebook_sync_allow", $user->getGUID(), "socialink") != "no") {
-			// get configured fields and network fields
-			if (($configured_fields = socialink_get_configured_network_fields("facebook")) && ($network_fields = socialink_get_network_fields("facebook"))) {
-				// ask the api for all fields
-				if ($api_result = socialink_facebook_get_profile_information($user->getGUID())) {
-					
-					// check settings for each field
-					foreach ($configured_fields as $setting_name => $profile_field) {
-						$setting = "facebook_sync_" . $setting_name;
-						
-						if (elgg_get_plugin_user_setting($setting, $user->getGUID(), "socialink") != "no") {
-							$api_setting = $network_fields[$setting_name];
-							
-							$temp_result = $api_result[$api_setting];
-							
-							// are we dealing with a tags profile field type
-							if (!empty($CONFIG->profile) && is_array($CONFIG->profile)) {
-								if (array_key_exists($profile_field, $CONFIG->profile) && $CONFIG->profile[$profile_field] == "tags") {
-									$temp_result = string_to_tag_array($temp_result);
-								}
-							}
-							
-							// check if the user has this metadata field, to get access id
-							$params = array(
-								"guid" => $user->getGUID(),
-								"metadata_name" => $profile_field,
-								"limit" => false
-							);
-							
-							if ($metadata = elgg_get_metadata($params)) {
-								if (is_array($metadata)) {
-									$access_id = $metadata[0]->access_id;
-								} else {
-									$access_id = $metadata->access_id;
-								}
-							} else {
-								$access_id = get_default_access($user);
-							}
-							
-							// remove metadata to set new values
-							elgg_delete_metadata($params);
-							
-							// make new metadata field
-							if (!empty($temp_result)) {
-								if (is_array($temp_result)) {
-									foreach ($temp_result as $index => $temp_value) {
-										if ($index > 0) {
-											$multiple = true;
-										} else {
-											$multiple = false;
-										}
-										
-										create_metadata($user->getGUID(), $profile_field, $temp_value, 'text', $user->getGUID(), $access_id, $multiple);
-									}
-								} else {
-									create_metadata($user->getGUID(), $profile_field, $temp_result, 'text', $user->getGUID(), $access_id);
-								}
-							}
-						}
-					}
-				}
+	if (empty($user_guid)) {
+		return;
+	}
+	
+	$user = get_user($user_guid);
+	if (empty($user) || !socialink_facebook_is_connected($user_guid)) {
+		return;
+	}
+	
+	// does the user allow sync
+	if (elgg_get_plugin_user_setting("facebook_sync_allow", $user->getGUID(), "socialink") === "no") {
+		return;
+	}
+	
+	// get configured fields and network fields
+	$profile_fields = elgg_get_config("profile_fields");
+	$configured_fields = socialink_get_configured_network_fields("facebook");
+	$network_fields = socialink_get_network_fields("facebook");
+	
+	if (empty($profile_fields) || empty($configured_fields) || empty($network_fields)) {
+		return;
+	}
+	
+	// ask the api for all fields
+	$api_result = socialink_facebook_get_profile_information($user->getGUID());
+	if (!empty($api_result)) {
+		
+		// check settings for each field
+		foreach ($configured_fields as $setting_name => $profile_field) {
+			$setting = "facebook_sync_" . $setting_name;
+			
+			if (elgg_get_plugin_user_setting($setting, $user->getGUID(), "socialink") === "no") {
+				continue;
 			}
 			
-			// sync profile icon, only if the user has no icon
-			if (empty($user->icontime)) {
-				socialink_facebook_sync_profile_icon($user->getGUID());
+			$api_setting = $network_fields[$setting_name];
+			
+			$temp_result = call_user_func(array($api_result, $api_setting));
+			
+			// are we dealing with a tags profile field type
+			$field_type = elgg_extract($profile_field, $profile_fields);
+			if ($field_type === "tags") {
+				$temp_result = string_to_tag_array($temp_result);
+			}
+			
+			// check if the user has this metadata field, to get access id
+			$params = array(
+				"guid" => $user->getGUID(),
+				"metadata_name" => $profile_field,
+				"limit" => false
+			);
+			
+			if ($metadata = elgg_get_metadata($params)) {
+				if (is_array($metadata)) {
+					$access_id = $metadata[0]->access_id;
+				} else {
+					$access_id = $metadata->access_id;
+				}
+			} else {
+				$access_id = get_default_access($user);
+			}
+			
+			// remove metadata to set new values
+			elgg_delete_metadata($params);
+			
+			// make new metadata field
+			if (empty($temp_result)) {
+				continue;
+			}
+			
+			if (is_array($temp_result)) {
+				foreach ($temp_result as $index => $temp_value) {
+					if ($index > 0) {
+						$multiple = true;
+					} else {
+						$multiple = false;
+					}
+					
+					create_metadata($user->getGUID(), $profile_field, $temp_value, 'text', $user->getGUID(), $access_id, $multiple);
+				}
+			} else {
+				create_metadata($user->getGUID(), $profile_field, $temp_result, 'text', $user->getGUID(), $access_id);
 			}
 		}
+	}
+	
+	// sync profile icon, only if the user has no icon
+	if (empty($user->icontime)) {
+		socialink_facebook_sync_profile_icon($user->getGUID());
 	}
 }
 
@@ -383,51 +389,83 @@ function socialink_facebook_sync_profile_metadata($user_guid = 0) {
  * @return bool
  */
 function socialink_facebook_sync_profile_icon($user_guid = 0) {
-	$result = false;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
-	if (($user = get_user($user_guid)) && ($keys = socialink_facebook_is_connected($user_guid))) {
-		if ($profile_info = socialink_facebook_get_profile_information($user_guid)) {
-			$url = Facebook::$DOMAIN_MAP["graph"] . $profile_info["id"] . "/picture/";
+	if (empty($user_guid)) {
+		return false;
+	}
+	
+	$session = socialink_facebook_is_connected($user_guid);
+	if (empty($session)) {
+		return false;
+	}
+	
+	$user = get_user($user_guid);
+	if (empty($user)) {
+		return false;
+	}
+	
+	$request = new FaceBook\FacebookRequest($session, "GET", "/me/picture", array("redirect" => "false", "type" => "large"));
+	
+	// set correct proxy settings (if needed)
+	$curl_http_client = socialink_facebook_get_curl_http_client();
+	$request->setHttpClientHandler($curl_http_client);
+	
+	try {
+		$api_result = $request->execute()->getGraphObject();
+	} catch(Exception $e) {}
+	
+	if (empty($api_result)) {
+		return false;
+	}
+	
+	$profile_icon_url = $api_result->getProperty("url");
+	if (empty($profile_icon_url)) {
+		return false;
+	}
+	
+	if (!file_get_contents($profile_icon_url)) {
+		return false;
+	}
+	
+	$icon_sizes = elgg_get_config("icon_sizes");
+	if (empty($icon_sizes)) {
+		return false;
+	}
+	
+	$result = false;
+	$fh = new ElggFile();
+	$fh->owner_guid = $user->getGUID();
+
+	foreach ($icon_sizes as $name => $properties) {
+		$resize = get_resized_image_from_existing_file(
+				$profile_icon_url,
+				$properties["w"],
+				$properties["h"],
+				$properties["square"],
+				0, 0, 0, 0,
+				$properties["upscale"]
+		);
 			
-			$params = array(
-				"type" => "large"
-			);
-			
-			$url = elgg_http_add_url_query_elements($url, $params);
-			
-			if (file_get_contents($url)) {
-				$icon_sizes = elgg_get_config("icon_sizes");
+		if (!empty($resize)) {
+			$fh->setFilename("profile/" . $user->getGUID() . $name . ".jpg");
+			$fh->open("write");
+			$fh->write($resize);
+			$fh->close();
 				
-				if (!empty($icon_sizes)) {
-					$fh = new ElggFile();
-					$fh->owner_guid = $user->getGUID();
-					
-					foreach ($icon_sizes as $name => $properties) {
-						$resize = get_resized_image_from_existing_file($url, $properties["w"], $properties["h"], $properties["square"], 0, 0, 0, 0, $properties["upscale"]);
-						
-						if (!empty($resize)) {
-							$fh->setFilename("profile/" . $user->getGUID() . $name . ".jpg");
-							$fh->open("write");
-							$fh->write($resize);
-							$fh->close();
-				
-							$result = true;
-						}
-					}
-				}
-					
-				if (!empty($result)) {
-					$user->icontime = time();
-				
-					// trigger event to let others know the icon was updated
-					elgg_trigger_event("profileiconupdate", $user->type, $user);
-				}
-			}
+			$result = true;
 		}
+	}
+
+	if (!empty($result)) {
+		$user->icontime = time();
+			
+		// trigger event to let others know the icon was updated
+		elgg_trigger_event("profileiconupdate", $user->type, $user);
 	}
 	
 	return $result;
@@ -441,72 +479,93 @@ function socialink_facebook_sync_profile_icon($user_guid = 0) {
  * @return bool|ElggUser
  */
 function socialink_facebook_create_user($token) {
-	$result = false;
 	
-	if (!empty($token)) {
-		if ($keys = socialink_facebook_available()) {
-			if ($api = socialink_facebook_get_api_object($keys)) {
-				$url = "me";
-				$params = array(
-					"access_token" => $token,
-					"fields" => "name,email"
-				);
-				
-				try {
-					$api_result = $api->api($url, $params);
-				} catch(Exception $e) {}
-				
-				if (!empty($api_result)) {
-					$name = $api_result["name"];
-					$email = $api_result["email"];
-					
-					if (!get_user_by_email($email)) {
-						$pwd = generate_random_cleartext_password();
-						$username = socialink_create_username_from_email($email);
-						
-						try {
-							if ($user_guid = register_user($username, $pwd, $name, $email)) {
-								// show hidden entities
-								$access = access_get_show_hidden_status();
-								access_show_hidden_entities(TRUE);
-								
-								if ($user = get_user($user_guid)) {
-									// register user's access tokens
-									elgg_set_plugin_user_setting('facebook_access_token', $token, $user_guid, "socialink");
-									
-									// no need for uservalidationbyemail
-									elgg_unregister_plugin_hook_handler("register", "user", "uservalidationbyemail_disable_new_user");
-									
-									// sync user data
-									socialink_facebook_sync_profile_metadata($user->getGUID());
-									
-									// trigger hook for registration
-									$params = array(
-										"user" => $user,
-										"password" => $pwd,
-										"friend_guid" => 0,
-										"invitecode" => ""
-									);
-									
-									if (elgg_trigger_plugin_hook("register", "user", $params, true) !== false) {
-										// return the user
-										$result = $user;
-									}
-								}
-								
-								// restore hidden entities
-								access_show_hidden_entities($access);
-							}
-						} catch(Exception $e){}
-					} else {
-						register_error(elgg_echo("socialink:networks:create_user:error:email"));
-					}
-				}
-			}
-		}
+	if (empty($token)) {
+		return false;
 	}
 	
-	return $result;
+	if (!socialink_facebook_available()) {
+		return false;
+	}
+	
+	$session = new Facebook\FacebookSession($token);
+	if (empty($session)) {
+		return false;
+	}
+	
+	$request = new FaceBook\FacebookRequest($session, "GET", "/me");
+	
+	// set correct proxy settings (if needed)
+	$curl_http_client = socialink_facebook_get_curl_http_client();
+	$request->setHttpClientHandler($curl_http_client);
+		
+	try {
+		$api_result = $request->execute()->getGraphObject(Facebook\GraphUser::className());
+	} catch(Exception $e) {}
+	
+	if (empty($api_result)) {
+		return false;
+	}
+	
+	// get user information
+	$name = $api_result->getName();
+	$email = $api_result->getEmail();
+	
+	if (get_user_by_email($email)) {
+		register_error(elgg_echo("socialink:networks:create_user:error:email"));
+		return false;
+	}
+	
+	$pwd = generate_random_cleartext_password();
+	$username = socialink_create_username_from_email($email);
+	
+	try {
+		$user_guid = register_user($username, $pwd, $name, $email);
+		if (empty($user_guid)) {
+			return false;
+		}
+		
+		// show hidden entities
+		$access = access_get_show_hidden_status();
+		access_show_hidden_entities(true);
+		
+		$user = get_user($user_guid);
+		if (empty($user)) {
+			access_show_hidden_entities($access);
+			
+			return false;
+		}
+		
+		// register user's access tokens
+		elgg_set_plugin_user_setting("facebook_access_token", $token, $user_guid, "socialink");
+		elgg_set_plugin_user_setting("facebook_user_id", $api_result->getId(), $user_guid, "socialink");
+		
+		// no need for uservalidationbyemail
+		elgg_unregister_plugin_hook_handler("register", "user", "uservalidationbyemail_disable_new_user");
+		
+		// sync user data
+		socialink_facebook_sync_profile_metadata($user->getGUID());
+		
+		// trigger hook for registration
+		$params = array(
+			"user" => $user,
+			"password" => $pwd,
+			"friend_guid" => 0,
+			"invitecode" => ""
+		);
+		
+		if (elgg_trigger_plugin_hook("register", "user", $params, true) !== false) {
+			access_show_hidden_entities($access);
+			
+			// return the user
+			return $user;
+		}
+		
+		// restore hidden entities
+		access_show_hidden_entities($access);
+	} catch(Exception $e){}
+	
+	return false;
 }
 
 /**
@@ -517,28 +576,84 @@ function socialink_facebook_create_user($token) {
  * @return bool
  */
 function socialink_facebook_validate_connection($user_guid = 0) {
-	$result = true;
 	
+	$user_guid = sanitise_int($user_guid, false);
 	if (empty($user_guid)) {
 		$user_guid = elgg_get_logged_in_user_guid();
 	}
 	
+	if (empty($user_guid)) {
+		return false;
+	}
+	
 	// can we get a user
-	if ($keys = socialink_facebook_is_connected($user_guid)) {
-		if ($api = socialink_facebook_get_api_object($keys)) {
+	$session = socialink_facebook_is_connected($user_guid);
+	if (empty($session)) {
+		return false;
+	}
+	
+	try {
+		return $session->validate();
+	} catch (Exceptions $e) {}
+	
+	return false;
+}
+
+/**
+ * Get the Facebook user_id for a given access token
+ *
+ * @param AccessToken|string $access_token a valid Facebook access token
+ *
+ * @return bool|string
+ */
+function socialink_facebook_get_user_id_from_access_token($access_token) {
+	
+	if (empty($access_token)) {
+		return false;
+	}
+	
+	$session = new Facebook\FacebookSession($access_token);
+	if (empty($session)) {
+		return false;
+	}
+	
+	$token = $session->getAccessToken();
+	if (empty($token)) {
+		return false;
+	}
+	
+	$token_info = $token->getInfo();
+	if (empty($token_info)) {
+		return false;
+	}
+	
+	return $token_info->getId();
+}
+
+/**
+ * Get the Facebook cUrl client with the correct proxy settings for use with FacebookRequest
+ *
+ * @return \Facebook\HttpClients\FacebookCurlHttpClient
+ */
+function socialink_facebook_get_curl_http_client() {
+	static $result;
+	
+	if (!isset($result)) {
+		$result = new Facebook\HttpClients\FacebookCurlHttpClient();
+		
+		$proxy_settings = socialink_get_proxy_settings();
+		if (!empty($proxy_settings)) {
 			
-			$url = "me";
-			$params = array(
-				"access_token" => $keys["access_token"],
-				"fields" => "name"
-			);
+			$curl_client = new Facebook\HttpClients\FacebookCurl();
+			$curl_client->setopt(CURLOPT_PROXY, $proxy_settings["CURLOPT_PROXY"]);
 			
-			try {
-				$api->api($url, $params);
-			} catch(Exception $e) {
-				$result = false;
+			if (!empty($proxy_settings["CURLOPT_PROXYPORT"])) {
+				$curl_client->setopt(CURLOPT_PROXYPORT, $proxy_settings["CURLOPT_PROXYPORT"]);
 			}
+			
+			$result = new Facebook\HttpClients\FacebookCurlHttpClient($curl_client);
 		}
 	}
+	
 	return $result;
 }

@@ -14,7 +14,8 @@ echo "<div class='socialink_usersettings_network_icon' id='socialink_usersetting
 echo "<div class='socialink_usersettings_network_config'>";
 
 // is the user conntected
-if ($keys = socialink_facebook_is_connected($user->getGUID())) {
+if (socialink_facebook_is_connected($user->getGUID())) {
+	
 	$facebook_remove_link = elgg_add_action_tokens_to_url("action/socialink/remove?service=facebook");
 	
 	$link_begin = "<a href='" . $facebook_remove_link . "'>";

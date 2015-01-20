@@ -43,20 +43,24 @@ function socialink_twitter_available() {
 /**
  * Check if the Facebook link is available
  *
- * @return bool|array
+ * @return bool
  */
 function socialink_facebook_available() {
-	$result = false;
+	static $result;
 	
-	if (elgg_get_plugin_setting("enable_facebook", "socialink") == "yes") {
-		$app_id = elgg_get_plugin_setting("facebook_app_id", "socialink");
-		$app_secret = elgg_get_plugin_setting("facebook_app_secret", "socialink");
+	if (!isset($result)) {
+		$result = false;
 		
-		if (!empty($app_id) && !empty($app_secret)) {
-			$result = array(
-				"app_id" => $app_id,
-				"app_secret" => $app_secret
-			);
+		if (elgg_get_plugin_setting("enable_facebook", "socialink") == "yes") {
+			$app_id = elgg_get_plugin_setting("facebook_app_id", "socialink");
+			$app_secret = elgg_get_plugin_setting("facebook_app_secret", "socialink");
+			
+			if (!empty($app_id) && !empty($app_secret)) {
+				// set defaults
+				Facebook\FacebookSession::setDefaultApplication($app_id, $app_secret);
+				
+				$result = true;
+			}
 		}
 	}
 	
@@ -289,16 +293,13 @@ function socialink_get_network_fields($network) {
 				"industry" => "industry"
 			),
 			"facebook" => array(
-				"name" => "name",
-				"firstname" => "first_name",
-				"lastname" => "last_name",
-				"profile_url" => "link",
-				"email" => "email",
-				"location" => "location",
-				"gender" => "gender",
-				"about" => "about",
-				"bio" => "bio",
-				"hometown" => "hometown"
+				"name" => "getName",
+				"firstname" => "getFirstName",
+				"lastname" => "getLastName",
+				"profile_url" => "getLink",
+				"email" => "getEmail",
+				"location" => "getLocation()->getCity",
+				"gender" => "getGender",
 			)
 		);
 		

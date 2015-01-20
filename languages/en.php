@@ -58,9 +58,6 @@ return array(
 	'socialink:facebook:field:email' => "E-mail address",
 	'socialink:facebook:field:location' => "Location",
 	'socialink:facebook:field:gender' => "Gender",
-	'socialink:facebook:field:about' => "About me",
-	'socialink:facebook:field:bio' => "Bio",
-	'socialink:facebook:field:hometown' => "Hometown",
 	
 	// views
 	// admin settings

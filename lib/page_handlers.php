@@ -115,27 +115,35 @@ function socialink_page_handler($page) {
 					}
 					break;
 				case "facebook":
-					$state = get_input("state", NULL);
-						
-					if ($token = socialink_facebook_get_access_token($state)) {
-						$params = array(
-							"type" => "user",
-							"limit" => 1,
-							"site_guids" => false,
-							"plugin_id" => "socialink",
-							"plugin_user_setting_name_value_pairs" => array(
-								"facebook_access_token" => $token
-							)
-						);
-						
-						if ($users = elgg_get_entities_from_plugin_user_settings($params)) {
-							$user = $users[0];
-						} else {
-							$_SESSION["socialink_token"] = $token;
-							forward("socialink/no_linked_account/facebook");
-						}
-					} else {
+					$token = socialink_facebook_get_access_token();
+					
+					if (empty($token)) {
 						register_error($error_msg_no_user);
+						break;
+					}
+					
+					$user_id = socialink_facebook_get_user_id_from_access_token($token);
+					if (empty($user_id)) {
+						register_error($error_msg_no_user);
+						break;
+					}
+					
+					$params = array(
+						"type" => "user",
+						"limit" => 1,
+						"site_guids" => false,
+						"plugin_id" => "socialink",
+						"plugin_user_setting_name_value_pairs" => array(
+							"facebook_user_id" => $user_id
+						)
+					);
+					
+					$users = elgg_get_entities_from_plugin_user_settings($params);
+					if (!empty($users)) {
+						$user = $users[0];
+					} else {
+						$_SESSION["socialink_token"] = $token;
+						forward("socialink/no_linked_account/facebook");
 					}
 					break;
 				case "wordpress":
