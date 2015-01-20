@@ -566,6 +566,9 @@ function socialink_linkedin_create_user($token) {
 		elgg_set_plugin_user_setting("linkedin_oauth_token", $token["oauth_token"], $user_guid, "socialink");
 		elgg_set_plugin_user_setting("linkedin_oauth_secret", $token["oauth_token_secret"], $user_guid, "socialink");
 		
+		// no need for uservalidationbyemail
+		elgg_unregister_plugin_hook_handler("register", "user", "uservalidationbyemail_disable_new_user");
+		
 		// sync user data
 		socialink_linkedin_sync_profile_metadata($user->getGUID());
 		
