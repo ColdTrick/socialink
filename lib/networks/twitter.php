@@ -155,7 +155,7 @@ function socialink_twitter_get_access_token($oauth_verifier = null) {
 /**
  * Authorize a Twitter account
  *
- * @param int    $user_guid the user_guid to authorize
+ * @param int $user_guid the user_guid to authorize
  *
  * @return bool
  */
