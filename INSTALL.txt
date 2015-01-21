@@ -1,0 +1,20 @@
+Installation instructions
+=========================
+
+Downloaded from the Elgg community
+----------------------------------
+
+- unzip the downloaded file in your /mod directory
+- have fun!
+
+Downloaded from Github
+----------------------
+
+- ```git checkout``` or ```git clone```
+- ```composer install```
+
+Using composer
+--------------
+
+- ```composer require coldtrick/socialink:dev-master```
+- or some other version
