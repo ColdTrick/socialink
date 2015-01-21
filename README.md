@@ -13,8 +13,7 @@ Contents
 
 1. Features
 2. External libaries
-3. ToDo
-4. WordPress
+3. WordPress
 
 1. Features
 -----------
@@ -42,17 +41,7 @@ Contents
 - by Paul Mennega
 - URL: http://code.google.com/p/simple-linkedinphp/
 
-3. ToDo
--------
-
-- Post to The Wire
-- Twitter in
-- If The Wire to network, prevent twitter deadloops
-- Share content on social networks
-- different social network icons (size: medium, large, huge, .....)
-- extend register form with social networks
-
-4. WordPress
+3. WordPress
 ------------
 
 In order to use the WordPress connection you need the [OAuth Provider](http://wordpress.org/extend/plugins/oauth-provider/) WordPress plugin installed.
