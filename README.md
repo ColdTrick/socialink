@@ -39,8 +39,8 @@ Contents
 
 ### LinkedIn
 
-- by Ashwin Surajbali
-- URL: https://github.com/ashwinks/PHP-LinkedIn-SDK
+- by Paul Mennega
+- URL: http://code.google.com/p/simple-linkedinphp/
 
 3. ToDo
 -------
