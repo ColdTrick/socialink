@@ -1,5 +1,4 @@
 <?php
-use Facebook;
 /**
  * All Facebook releated helper functions are bundeld here
  */
