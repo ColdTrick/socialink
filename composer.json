@@ -1,0 +1,14 @@
+{
+    "name": "coldtrick/socialink",
+    "description": "Login to your Elgg social network useing LinkedIn, Twitter and/or Facebook.",
+    "type": "elgg-plugin",
+    "keywords": ["elgg", "plugin","login"],
+    "license": "GPL-2.0",
+    "support": {
+        "source": "https://github.com/ColdTrick/socialink",
+        "issues": "https://github.com/ColdTrick/socialink/issues"
+    },
+    "require": {
+        "composer/installers": "^1.0.8"
+    }
+}
