@@ -219,7 +219,7 @@ function socialink_linkedin_authorize($user_guid = 0) {
 	$access_status = access_get_show_hidden_status();
 	access_show_hidden_entities(true);
 	
-	$users = new Elggbatch("elgg_get_entities_from_plugin_user_settings", $params);
+	$users = new ElggBatch("elgg_get_entities_from_plugin_user_settings", $params);
 	foreach ($users as $user) {
 		// revoke access
 		elgg_unset_plugin_user_setting("linkedin_oauth_token", $user->getGUID(), "socialink");
